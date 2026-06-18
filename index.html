@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TempoTela — Login</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f172a;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container {
+    width: 100%;
+    max-width: 400px;
+  }
+  .logo {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .logo-icon {
+    font-size: 56px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .logo h1 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .logo p {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .card {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 28px 24px;
+    border: 1px solid #334155;
+  }
+  .tabs {
+    display: flex;
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 24px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+  }
+  .tab.active {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .form-group {
+    margin-bottom: 16px;
+  }
+  label {
+    display: block;
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px 14px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    color: #f1f5f9;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus {
+    border-color: #3b82f6;
+  }
+  select option {
+    background: #1e293b;
+  }
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 8px;
+  }
+  .btn:active { opacity: 0.85; }
+  .btn-primary {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .btn-primary:disabled {
+    background: #334155;
+    color: #64748b;
+    cursor: not-allowed;
+  }
+  .error-msg {
+    color: #f87171;
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+    display: none;
+  }
+  .loading {
+    display: none;
+    text-align: center;
+    color: #94a3b8;
+    padding: 20px;
+  }
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #334155;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Registro — campo extra */
+  #cadastro-extra { display: none; }
+  #cadastro-extra.show { display: block; }
+
+  .divider {
+    text-align: center;
+    color: #475569;
+    font-size: 13px;
+    margin: 16px 0;
+    position: relative;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: #334155;
+  }
+  .divider::before { left: 0; }
+  .divider::after { right: 0; }
+
+  /* Seleção de família */
+  #familia-section { display: none; }
+  #familia-section.show { display: block; }
+  .familia-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .familia-box:hover { border-color: #3b82f6; }
+  .familia-box .fam-icon { font-size: 24px; }
+  .familia-box .fam-info { flex: 1; }
+  .familia-box .fam-nome { color: #f1f5f9; font-size: 14px; font-weight: 600; }
+  .familia-box .fam-id { color: #64748b; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <span class="logo-icon">⏱️</span>
+    <h1>TempoTela</h1>
+    <p>Controle o tempo de tela em família</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('login')">Entrar</button>
+      <button class="tab" onclick="showTab('cadastro')">Criar conta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="tab-login">
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
+      </div>
+      <button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="tab-cadastro" style="display:none">
+      <div class="form-group">
+        <label>Seu nome</label>
+        <input type="text" id="cad-nome" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="cad-email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="cad-senha" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="form-group">
+        <label>Você é</label>
+        <select id="cad-tipo" onchange="tipoConta()">
+          <option value="">Selecione...</option>
+          <option value="pai">Pai / Mãe</option>
+          <option value="filho">Filho / Filha</option>
+        </select>
+      </div>
+
+      <!-- Campos extras: Filho precisa de código da família -->
+      <div id="cad-filho-extra" class="form-group" style="display:none">
+        <label>Código da família (peça para seus pais)</label>
+        <input type="text" id="cad-familia-codigo" placeholder="Ex: abc123">
+      </div>
+
+      <button class="btn btn-primary" onclick="criarConta()">Criar conta</button>
+    </div>
+
+    <div class="error-msg" id="erro-msg"></div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Carregando...</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCnpDlP0ZsnwXgB7D5YTL5n0-ZpWO42aCA",
+  authDomain: "tempotela-36229.firebaseapp.com",
+  projectId: "tempotela-36229",
+  storageBucket: "tempotela-36229.firebasestorage.app",
+  messagingSenderId: "505204192519",
+  appId: "1:505204192519:web:844e29d8340f7fb93081a2"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Redirecionar se já logado (apenas no carregamento inicial)
+let cadastrandoAgora = false;
+onAuthStateChanged(auth, async (user) => {
+  if (user && !cadastrandoAgora) {
+    mostrarLoading(true);
+    const snap = await getDoc(doc(db, 'usuarios', user.uid));
+    if (snap.exists()) {
+      window.location.href = snap.data().tipo === 'pai' ? 'pai.html' : 'filho.html';
+    } else {
+      mostrarLoading(false);
+    }
+  }
+});
+
+function mostrarLoading(show) {
+  document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
+function mostrarErro(msg) {
+  const el = document.getElementById('erro-msg');
+  el.style.display = 'block';
+  el.textContent = msg;
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+window.showTab = function(tab) {
+  document.getElementById('tab-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('tab-cadastro').style.display = tab === 'cadastro' ? 'block' : 'none';
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'cadastro' && i === 1));
+  });
+};
+
+window.tipoConta = function() {
+  const tipo = document.getElementById('cad-tipo').value;
+  document.getElementById('cad-filho-extra').style.display = tipo === 'filho' ? 'block' : 'none';
+};
+
+window.fazerLogin = async function() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  if (!email || !senha) return mostrarErro('Preencha e-mail e senha.');
+  mostrarLoading(true);
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+  } catch (e) {
+    mostrarLoading(false);
+    mostrarErro(traduzirErro(e.code));
+  }
+};
+
+window.criarConta = async function() {
+  const nome = document.getElementById('cad-nome').value.trim();
+  const email = document.getElementById('cad-email').value.trim();
+  const senha = document.getElementById('cad-senha').value;
+  const tipo = document.getElementById('cad-tipo').value;
+  if (!nome || !email || !senha || !tipo) return mostrarErro('Preencha todos os campos.');
+  if (senha.length < 6) return mostrarErro('Senha deve ter pelo menos 6 caracteres.');
+
+  mostrarLoading(true);
+
+  // Para filho: validar código ANTES de criar a conta
+  let familiaIdFilho = null;
+  if (tipo === 'filho') {
+    const codigoFamilia = document.getElementById('cad-familia-codigo').value.trim().toUpperCase();
+    if (!codigoFamilia) {
+      mostrarLoading(false);
+      return mostrarErro('Informe o código da família.');
+    }
+    const q = query(collection(db, 'familias'), where('codigoAcesso', '==', codigoFamilia));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      mostrarLoading(false);
+      return mostrarErro('Código de família inválido.');
+    }
+    familiaIdFilho = snap.docs[0].id;
+  }
+
+  cadastrandoAgora = true;
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, senha);
+    const uid = cred.user.uid;
+
+    if (tipo === 'pai') {
+      const familiaId = uid;
+      await setDoc(doc(db, 'familias', familiaId), {
+        codigoAcesso: familiaId.substring(0, 6).toUpperCase(),
+        pais: [uid],
+        filhos: [],
+        criadoEm: new Date()
+      });
+      await setDoc(doc(db, 'usuarios', uid), {
+        nome, email, tipo: 'pai', familiaId,
+        criadoEm: new Date()
+      });
+      window.location.href = 'pai.html';
+    } else {
+      await setDoc(doc(db, 'usuarios', uid), {
+        nome, email, tipo: 'filho', familiaId: familiaIdFilho,
+        tempoDisponivel: 0,
+        timerRodando: false,
+        timerInicio: null,
+        criadoEm: new Date()
+      });
+      await updateDoc(doc(db, 'familias', familiaIdFilho), {
+        filhos: arrayUnion(uid)
+      });
+      window.location.href = 'filho.html';
+    }
+  } catch (e) {
+    cadastrandoAgora = false;
+    mostrarLoading(false);
+    mostrarErro(traduzirErro(e.code));
+  }
+};
+
+function traduzirErro(code) {
+  const erros = {
+    'auth/invalid-email': 'E-mail inválido.',
+    'auth/user-not-found': 'Usuário não encontrado.',
+    'auth/wrong-password': 'Senha incorreta.',
+    'auth/email-already-in-use': 'E-mail já cadastrado.',
+    'auth/weak-password': 'Senha muito fraca.',
+    'auth/invalid-credential': 'E-mail ou senha incorretos.',
+    'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde.',
+  };
+  return erros[code] || 'Erro: ' + code;
+}
+</script>
+</body>
+</html>

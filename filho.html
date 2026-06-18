@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TempoTela — Filho</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #273449;
+  --border: #334155;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --purple: #a855f7;
+  --nav-h: 64px;
+  --top-h: 56px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.phone {
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  height: var(--top-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff;
+}
+.topbar-name { font-size: 15px; font-weight: 600; }
+.topbar-sub { font-size: 12px; color: var(--text2); }
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--text2);
+}
+
+/* ── PAGES ── */
+.pages-wrapper { flex: 1; overflow: hidden; position: relative; }
+.pages-scroll {
+  display: flex; height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.page {
+  min-width: 100%; height: 100%;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 16px 16px 24px;
+}
+.page::-webkit-scrollbar { width: 4px; }
+.page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── BOTTOM NAV ── */
+.bottomnav {
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  flex-shrink: 0; z-index: 10;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer; padding: 8px 4px;
+  border: none; background: transparent;
+  color: var(--text3); transition: color 0.15s;
+}
+.nav-item.active { color: var(--purple); }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%; transform: translateX(-50%);
+  width: 36px; height: 30px;
+  background: rgba(168,85,247,0.15);
+  border-radius: 10px;
+}
+.nav-icon { font-size: 22px; line-height: 1; position: relative; z-index: 1; }
+.nav-label { font-size: 10px; font-weight: 500; white-space: nowrap; }
+.nav-item.active .nav-icon { transform: scale(1.15); transition: transform 0.15s; }
+.nav-badge {
+  position: absolute; top: 6px; right: calc(50% - 18px);
+  background: var(--red); color: #fff;
+  font-size: 10px; font-weight: 700;
+  min-width: 16px; height: 16px;
+  border-radius: 8px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 2;
+}
+.nav-item { position: relative; }
+
+/* ── INÍCIO — TEMPO GRANDE ── */
+.tempo-hero {
+  background: var(--surface);
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.tempo-hero-label {
+  font-size: 13px;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.tempo-hero-valor {
+  font-size: 72px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.tempo-hero-valor.positivo { color: var(--green); }
+.tempo-hero-valor.baixo { color: var(--yellow); }
+.tempo-hero-valor.negativo { color: var(--red); }
+
+.timer-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.timer-status.rodando {
+  background: #16a34a22;
+  color: var(--green);
+  border: 1px solid #16a34a55;
+}
+.timer-status.parado {
+  background: var(--surface2);
+  color: var(--text2);
+}
+.timer-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.btn-timer {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-timer:active { transform: scale(0.98); }
+.btn-timer.iniciar {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  box-shadow: 0 4px 20px #22c55e44;
+}
+.btn-timer.parar {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  box-shadow: 0 4px 20px #ef444444;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.section-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title { font-size: 18px; font-weight: 700; }
+
+/* ── MISSÃO CARD ── */
+.missao-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.missao-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; margin-bottom: 8px;
+}
+.missao-titulo { font-size: 15px; font-weight: 600; }
+.missao-desc { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+.badge {
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  white-space: nowrap; flex-shrink: 0;
+}
+.badge-pendente { background: #f59e0b22; color: var(--yellow); }
+.badge-aceita { background: #3b82f622; color: var(--blue); }
+.badge-aguardando { background: #a855f722; color: var(--purple); }
+.badge-aprovada { background: #22c55e22; color: var(--green); }
+.badge-reprovada { background: #ef444422; color: var(--red); }
+.badge-recusada { background: #64748b22; color: var(--text3); }
+
+.missao-tempos { display: flex; gap: 12px; margin-bottom: 10px; }
+.tempo-chip { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; }
+.tempo-chip.ganho { color: var(--green); }
+.tempo-chip.perde { color: var(--red); }
+
+.missao-actions { display: flex; gap: 8px; }
+.btn-small {
+  padding: 7px 14px; border-radius: 20px;
+  border: none; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.btn-small:active { opacity: 0.8; }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-gray { background: var(--surface2); color: var(--text); }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center; padding: 40px 20px; color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%; max-width: 430px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  border-top: 1px solid var(--border);
+  max-height: 85vh; overflow-y: auto;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-handle {
+  width: 40px; height: 4px; background: var(--border);
+  border-radius: 2px; margin: 0 auto 20px;
+}
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+.form-group { margin-bottom: 14px; }
+label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+input, select, textarea {
+  width: 100%; padding: 11px 13px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); font-size: 15px;
+  outline: none; font-family: inherit; transition: border-color 0.2s;
+}
+textarea { resize: vertical; min-height: 80px; }
+input:focus, select:focus, textarea:focus { border-color: var(--purple); }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-full {
+  flex: 1; padding: 13px; border-radius: 12px;
+  border: none; font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.btn-full:active { opacity: 0.8; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; top: 70px; left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: var(--surface2); color: var(--text);
+  padding: 10px 20px; border-radius: 24px;
+  font-size: 14px; font-weight: 500;
+  border: 1px solid var(--border);
+  z-index: 200; opacity: 0; transition: all 0.25s;
+  white-space: nowrap; max-width: 90vw;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── TAREFAS FILHO ── */
+.tarefa-item {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tarefa-check {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tarefa-check.cumprida { background: var(--green); border-color: var(--green); }
+.tarefa-check.nao_cumprida { background: var(--red); border-color: var(--red); }
+.tarefa-info { flex: 1; }
+.tarefa-nome { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.tarefa-tempo { font-size: 12px; }
+
+/* ── HISTÓRICO ── */
+.hist-item {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 12px 14px;
+  background: var(--surface); border-radius: 12px;
+  border: 1px solid var(--border); margin-bottom: 8px;
+}
+
+/* ── CELEBRAÇÃO ── */
+.celebracao-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.4s;
+}
+.celebracao-overlay.show { opacity: 1; pointer-events: all; }
+.celebracao-card {
+  background: var(--surface);
+  border: 2px solid var(--green);
+  border-radius: 24px;
+  padding: 32px 28px;
+  text-align: center;
+  max-width: 300px;
+  width: 90%;
+  box-shadow: 0 0 60px #22c55e44;
+  transform: scale(0.8);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative; z-index: 2;
+}
+.celebracao-overlay.show .celebracao-card { transform: scale(1); }
+.celebracao-emoji { font-size: 56px; margin-bottom: 8px; }
+.celebracao-tempo {
+  font-size: 52px; font-weight: 900;
+  color: var(--green); letter-spacing: -2px;
+  margin-bottom: 4px;
+}
+.celebracao-label { font-size: 14px; color: var(--text2); margin-bottom: 12px; }
+.celebracao-motivo {
+  font-size: 15px; font-weight: 600;
+  background: var(--bg); border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 20px;
+  color: var(--text);
+}
+.celebracao-btn {
+  background: var(--green); color: #fff;
+  border: none; border-radius: 12px;
+  padding: 12px 32px; font-size: 16px;
+  font-weight: 700; cursor: pointer;
+}
+.confete-canvas {
+  position: fixed; inset: 0;
+  z-index: 1; pointer-events: none;
+}
+
+/* ── NOTIFICAÇÃO DE PERDA ── */
+.perda-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.4s;
+  background: rgba(239,68,68,0.08);
+}
+.perda-overlay.show { opacity: 1; pointer-events: all; }
+.perda-card {
+  background: var(--surface);
+  border: 2px solid var(--red);
+  border-radius: 24px;
+  padding: 32px 28px;
+  text-align: center;
+  max-width: 300px;
+  width: 90%;
+  box-shadow: 0 0 60px #ef444444;
+  transform: scale(0.8);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.perda-overlay.show .perda-card { transform: scale(1); }
+.perda-tempo {
+  font-size: 52px; font-weight: 900;
+  color: var(--red); letter-spacing: -2px;
+  margin-bottom: 4px;
+}
+.perda-btn {
+  background: var(--red); color: #fff;
+  border: none; border-radius: 12px;
+  padding: 12px 32px; font-size: 16px;
+  font-weight: 700; cursor: pointer;
+}
+@keyframes shake {
+  0%,100%{transform:scale(1) rotate(0deg)}
+  20%{transform:scale(1.05) rotate(-2deg)}
+  40%{transform:scale(1.05) rotate(2deg)}
+  60%{transform:scale(1.05) rotate(-1deg)}
+  80%{transform:scale(1.05) rotate(1deg)}
+}
+.perda-overlay.show .perda-card { animation: shake 0.5s ease 0.1s; }
+
+/* ── LOADING ── */
+.page-loading {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; flex-direction: column; gap: 12px; color: var(--text2);
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── PEDIDOS ── */
+.pedido-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-avatar" id="topbar-inicial">F</div>
+      <div>
+        <div class="topbar-name" id="topbar-nome">Carregando...</div>
+        <div class="topbar-sub" id="topbar-tempo" style="font-size:13px;font-weight:700;color:var(--green)">--:--</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="icon-btn" onclick="fazerLogout()" title="Sair" style="display:flex;align-items:center;justify-content:center">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 3C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h7v-2H5V5h7V3H5z"/>
+    <path d="M16.5 8.5L15.09 9.91 17.17 12H9v2h8.17l-2.08 2.09L16.5 17.5 21 13l-4.5-4.5z"/>
+  </svg>
+</button>
+    </div>
+  </div>
+
+  <!-- PÁGINAS -->
+  <div class="pages-wrapper">
+    <div class="pages-scroll" id="pages-scroll">
+
+      <!-- PÁGINA 0: INÍCIO -->
+      <div class="page" id="page-inicio">
+        <!-- Timer Hero -->
+        <div class="tempo-hero" id="tempo-hero">
+          <div class="tempo-hero-label">Seu tempo disponível</div>
+          <div class="tempo-hero-valor positivo" id="tempo-valor">00:00</div>
+          <div id="timer-status-box" class="timer-status parado">⏸ Timer parado</div>
+          <button class="btn-timer iniciar" id="btn-timer" onclick="toggleTimer()">
+            ▶ Iniciar contador
+          </button>
+        </div>
+
+        <!-- Missões pendentes (resumo) -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:700">Missões ativas</div>
+            <button class="btn-small btn-gray" onclick="irParaPagina(1)" style="font-size:12px;padding:5px 10px">Ver todas</button>
+          </div>
+          <div id="missoes-resumo">
+            <div class="page-loading" style="height:60px"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Tarefas de hoje (resumo) -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:15px;font-weight:700">Tarefas de hoje</div>
+            <button class="btn-small btn-gray" onclick="irParaPagina(2)" style="font-size:12px;padding:5px 10px">Ver todas</button>
+          </div>
+          <div id="tarefas-resumo">
+            <div class="page-loading" style="height:60px"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 1: MISSÕES -->
+      <div class="page" id="page-missoes">
+        <div class="section-header">
+          <div class="section-title">Minhas Missões</div>
+          <button class="btn-small btn-blue" onclick="abrirModal('modal-sugerir-missao')">+ Sugerir</button>
+        </div>
+        <div id="missoes-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 2: TAREFAS DIÁRIAS -->
+      <div class="page" id="page-tarefas">
+        <div class="section-header">
+          <div class="section-title">Tarefas de Hoje</div>
+        </div>
+        <div id="tarefas-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 3: PEDIDOS -->
+      <div class="page" id="page-pedidos">
+        <div class="section-header">
+          <div class="section-title">Meus Pedidos</div>
+          <button class="btn-small btn-blue" onclick="abrirModal('modal-novo-pedido')">+ Pedido</button>
+        </div>
+        <div id="pedidos-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 4: HISTÓRICO -->
+      <div class="page" id="page-historico">
+        <div class="section-header">
+          <div class="section-title">Histórico</div>
+        </div>
+        <div id="historico-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottomnav">
+    <button class="nav-item active" data-page="0" onclick="irParaPagina(0)">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Início</span>
+    </button>
+    <button class="nav-item" data-page="1" onclick="irParaPagina(1);limparBadgeMissoes()">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-label">Missões</span>
+      <span class="nav-badge" id="badge-missoes" style="display:none">!</span>
+    </button>
+    <button class="nav-item" data-page="2" onclick="irParaPagina(2)">
+      <span class="nav-icon">✅</span>
+      <span class="nav-label">Tarefas</span>
+    </button>
+    <button class="nav-item" data-page="3" onclick="irParaPagina(3)">
+      <span class="nav-icon">📬</span>
+      <span class="nav-label">Pedidos</span>
+    </button>
+    <button class="nav-item" data-page="4" onclick="irParaPagina(4)">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Histórico</span>
+    </button>
+  </div>
+
+</div><!-- /phone -->
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL: SUGERIR MISSÃO -->
+<div class="modal-overlay" id="modal-sugerir-missao" onclick="fecharModal('modal-sugerir-missao')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Sugerir Missão</div>
+    <div class="form-group">
+      <label>Título da missão</label>
+      <input type="text" id="sug-titulo" placeholder="Ex: Estudar matemática">
+    </div>
+    <div class="form-group">
+      <label>Descrição (opcional)</label>
+      <textarea id="sug-desc" placeholder="Explique o que você vai fazer..."></textarea>
+    </div>
+    <div class="tempo-row">
+      <div class="form-group">
+        <label>✅ Quero ganhar (min)</label>
+        <input type="number" id="sug-ganho" placeholder="30" min="0">
+      </div>
+      <div class="form-group">
+        <label>❌ Aceito perder (min)</label>
+        <input type="number" id="sug-perde" placeholder="15" min="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-sugerir-missao')">Cancelar</button>
+      <button class="btn-full btn-blue" onclick="sugerirMissao()">Enviar sugestão 💡</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRAÇÃO -->
+<canvas class="confete-canvas" id="confete-canvas"></canvas>
+
+<!-- NOTIFICAÇÃO DE PERDA -->
+<div class="perda-overlay" id="perda-overlay">
+  <div class="perda-card">
+    <div class="celebracao-emoji" id="perda-emoji">😢</div>
+    <div class="perda-tempo" id="perda-tempo">-30min</div>
+    <div class="celebracao-label" id="perda-label">de tempo perdido</div>
+    <div class="celebracao-motivo" id="perda-motivo"></div>
+    <button class="perda-btn" onclick="fecharPerda()">Ok, entendi 😔</button>
+  </div>
+</div>
+
+<div class="celebracao-overlay" id="celebracao-overlay">
+  <div class="celebracao-card">
+    <div class="celebracao-emoji">🎉</div>
+    <div class="celebracao-tempo" id="cel-tempo">+30min</div>
+    <div class="celebracao-label">de tempo ganho!</div>
+    <div class="celebracao-motivo" id="cel-motivo"></div>
+    <button class="celebracao-btn" onclick="fecharCelebracao()">Uhul! 🎊</button>
+  </div>
+</div>
+
+<!-- MODAL: NOVO PEDIDO -->
+<div class="modal-overlay" id="modal-novo-pedido" onclick="fecharModal('modal-novo-pedido')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Fazer Pedido</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Peça mais tempo para seus pais. Explique por que você precisa.</p>
+    <div class="form-group">
+      <label>Por que você precisa de mais tempo?</label>
+      <textarea id="pedido-motivo" placeholder="Ex: Quero assistir um filme com meus amigos..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Quanto tempo você está pedindo?</label>
+      <input type="number" id="pedido-min" placeholder="30" min="1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-novo-pedido')">Cancelar</button>
+      <button class="btn-full" style="background:var(--purple);color:#fff" onclick="enviarPedido()">Enviar pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR TAREFA -->
+<div class="modal-overlay" id="modal-confirmar-tarefa" onclick="fecharModal('modal-confirmar-tarefa')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Confirmar tarefa</div>
+    <input type="hidden" id="confirmar-tarefa-id">
+    <div id="confirmar-tarefa-info" style="margin-bottom:16px"></div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px">Você cumpriu esta tarefa hoje?</p>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-confirmar-tarefa')">Cancelar</button>
+      <button class="btn-full" style="background:var(--purple);color:#fff" onclick="confirmarTarefaCumprida()">✅ Sim, cumpri!</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getFirestore, doc, getDoc, updateDoc, addDoc, collection,
+  query, where, onSnapshot, orderBy, serverTimestamp, increment
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCnpDlP0ZsnwXgB7D5YTL5n0-ZpWO42aCA",
+  authDomain: "tempotela-36229.firebaseapp.com",
+  projectId: "tempotela-36229",
+  storageBucket: "tempotela-36229.firebasestorage.app",
+  messagingSenderId: "505204192519",
+  appId: "1:505204192519:web:844e29d8340f7fb93081a2"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let filhoData = null;
+let timerInterval = null;
+let unsubscribers = [];
+
+// ── AUTH ──
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  const snap = await getDoc(doc(db, 'usuarios', user.uid));
+  if (!snap.exists() || snap.data().tipo !== 'filho') {
+    await signOut(auth);
+    window.location.href = 'index.html';
+    return;
+  }
+  currentUser = { uid: user.uid, ...snap.data() };
+  document.getElementById('topbar-nome').textContent = currentUser.nome;
+  document.getElementById('topbar-inicial').textContent = currentUser.nome[0].toUpperCase();
+  iniciarListeners();
+});
+
+function iniciarListeners() {
+  // Dados do filho em tempo real
+  const u1 = onSnapshot(doc(db, 'usuarios', currentUser.uid), snap => {
+    if (!snap.exists()) return;
+    filhoData = { uid: snap.id, ...snap.data() };
+    atualizarTimerUI();
+  });
+  unsubscribers.push(u1);
+
+  // Missões
+  let missoesCarregadasInicial = false;
+  let missoesIdsConhecidos = new Set();
+  let missoesStatusConhecido = {};
+  const missaoQ = query(
+    collection(db, 'missoes'),
+    where('filhoId', '==', currentUser.uid)
+  );
+  const u2 = onSnapshot(missaoQ, snap => {
+    const missoes = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.criadoEm?.seconds || 0) - (a.criadoEm?.seconds || 0));
+    renderMissoes(missoes);
+    renderMissoesResumo(missoes);
+    if (!missoesCarregadasInicial) {
+      missoes.forEach(m => {
+        missoesIdsConhecidos.add(m.id);
+        missoesStatusConhecido[m.id] = m.status;
+      });
+      missoesCarregadasInicial = true;
+    } else {
+      let novas = 0;
+      missoes.forEach(m => {
+        const statusAnterior = missoesStatusConhecido[m.id];
+        missoesStatusConhecido[m.id] = m.status;
+        if (!missoesIdsConhecidos.has(m.id)) {
+          missoesIdsConhecidos.add(m.id);
+          if (m.status === 'pendente') {
+            novas++;
+          }
+        } else if (statusAnterior && statusAnterior !== m.status) {
+          if (m.status === 'aceita' && statusAnterior === 'sugerida') {
+            mostrarBadgeMissoes(1);
+            toast('✅ Seu pai aceitou sua sugestão de missão!');
+          } else if (m.status === 'recusada' && statusAnterior === 'sugerida') {
+            mostrarBadgeMissoes(1);
+            toast('❌ Seu pai recusou sua sugestão de missão.');
+          } else if (m.status === 'aprovada') {
+            toast('🏆 Missão aprovada pelo pai! Tempo adicionado.');
+          } else if (m.status === 'reprovada') {
+            toast('😔 Missão reprovada pelo pai.');
+          }
+        }
+      });
+      if (novas > 0) {
+        mostrarBadgeMissoes(novas);
+        toast('🎯 Nova missão disponível!');
+      }
+    }
+  });
+  unsubscribers.push(u2);
+
+  // Tarefas diárias
+  const tarefaQ = query(
+    collection(db, 'tarefas_diarias'),
+    where('filhoId', '==', currentUser.uid)
+  );
+  const u3 = onSnapshot(tarefaQ, snap => {
+    const tarefas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTarefas(tarefas);
+    renderTarefasResumo(tarefas);
+  });
+  unsubscribers.push(u3);
+
+  // Pedidos
+  const pedidoQ = query(
+    collection(db, 'pedidos'),
+    where('filhoId', '==', currentUser.uid)
+  );
+  const u4 = onSnapshot(pedidoQ, snap => {
+    const pedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.criadoEm?.seconds || 0) - (a.criadoEm?.seconds || 0));
+    renderPedidos(pedidos);
+  });
+  unsubscribers.push(u4);
+
+  // Histórico + detecção de tempo ganho
+  let histCarregadoInicial = false;
+  let histIdsConhecidos = new Set();
+  const histQ = query(
+    collection(db, 'historico'),
+    where('filhoId', '==', currentUser.uid)
+  );
+  const u5 = onSnapshot(histQ, snap => {
+    const hist = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.criadoEm?.seconds || 0) - (a.criadoEm?.seconds || 0));
+    renderHistorico(hist);
+    if (!histCarregadoInicial) {
+      hist.forEach(h => histIdsConhecidos.add(h.id));
+      histCarregadoInicial = true;
+    } else {
+      hist.forEach(h => {
+        if (!histIdsConhecidos.has(h.id)) {
+          histIdsConhecidos.add(h.id);
+          if ((h.tempo || 0) > 0) {
+            mostrarCelebracao(h.tempo, h.descricao || 'Parabéns!');
+          } else if ((h.tempo || 0) < 0) {
+            mostrarPerda(h.tempo, h.descricao || 'Tempo descontado.');
+          }
+        }
+      });
+    }
+  });
+  unsubscribers.push(u5);
+
+  // Timer local
+  timerInterval = setInterval(() => {
+    if (filhoData) atualizarTimerUI();
+  }, 1000);
+}
+
+// ── TIMER UI ──
+function calcTempoAtual() {
+  if (!filhoData) return 0;
+  let tempo = filhoData.tempoDisponivel || 0;
+  if (filhoData.timerRodando && filhoData.timerInicio) {
+    const inicio = filhoData.timerInicio.toDate ? filhoData.timerInicio.toDate() : new Date(filhoData.timerInicio);
+    const elapsed = Math.floor((Date.now() - inicio.getTime()) / 1000);
+    tempo -= elapsed;
+  }
+  return tempo;
+}
+
+function formatarTempo(seg) {
+  const abs = Math.abs(seg);
+  const h = Math.floor(abs / 3600);
+  const m = Math.floor((abs % 3600) / 60);
+  const s = abs % 60;
+  const neg = seg < 0 ? '-' : '';
+  if (h > 0) return `${neg}${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${neg}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function formatarMin(seg) {
+  if (!seg) return '0min';
+  const m = Math.round(seg / 60);
+  return m >= 60 ? `${Math.floor(m/60)}h${m%60?m%60+'min':''}` : `${m}min`;
+}
+
+function atualizarTimerUI() {
+  const tempoSeg = calcTempoAtual();
+  const rodando = filhoData?.timerRodando || false;
+
+  const valEl = document.getElementById('tempo-valor');
+  const statusEl = document.getElementById('timer-status-box');
+  const btnEl = document.getElementById('btn-timer');
+  const topbarTempo = document.getElementById('topbar-tempo');
+
+  const tempoStr = formatarTempo(tempoSeg);
+  valEl.textContent = tempoStr;
+  valEl.className = `tempo-hero-valor ${tempoSeg > 300 ? 'positivo' : tempoSeg > 0 ? 'baixo' : 'negativo'}`;
+
+  // Topbar sempre mostra o tempo com cor dinâmica
+  topbarTempo.textContent = tempoStr;
+  topbarTempo.style.color = tempoSeg > 300 ? 'var(--green)' : tempoSeg > 0 ? 'var(--yellow)' : 'var(--red)';
+
+  if (rodando) {
+    statusEl.className = 'timer-status rodando';
+    statusEl.innerHTML = '<div class="timer-dot"></div>Contador ativo — descontando';
+    btnEl.className = 'btn-timer parar';
+    btnEl.innerHTML = '⏹ Parar contador';
+  } else {
+    statusEl.className = 'timer-status parado';
+    statusEl.innerHTML = '⏸ Timer parado';
+    btnEl.className = 'btn-timer iniciar';
+    btnEl.innerHTML = '▶ Iniciar contador';
+  }
+}
+
+// ── CELEBRAÇÃO + CONFETE ──
+let confeteAnimId = null;
+let celebracaoAutoCloseTimer = null;
+
+function mostrarCelebracao(tempoSeg, motivo) {
+  const min = Math.round(tempoSeg / 60);
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  const tempoStr = h > 0 ? `+${h}h${m ? m + 'min' : ''}` : `+${min}min`;
+  document.getElementById('cel-tempo').textContent = tempoStr;
+  document.getElementById('cel-motivo').textContent = motivo;
+  document.getElementById('celebracao-overlay').classList.add('show');
+  iniciarConfete();
+  // Auto-encerra após 6 segundos
+  clearTimeout(celebracaoAutoCloseTimer);
+  celebracaoAutoCloseTimer = setTimeout(() => fecharCelebracao(), 6000);
+}
+
+window.fecharCelebracao = function() {
+  clearTimeout(celebracaoAutoCloseTimer);
+  document.getElementById('celebracao-overlay').classList.remove('show');
+  pararConfete();
+};
+
+function iniciarConfete() {
+  pararConfete(); // garante que não há animação anterior rodando
+  const canvas = document.getElementById('confete-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+
+  const cores = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#ec4899','#06b6d4','#f97316'];
+  const particulas = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 5 + 3,
+    cor: cores[Math.floor(Math.random() * cores.length)],
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random() - 0.5) * 2,
+    vy: Math.random() * 3 + 2,
+    vr: (Math.random() - 0.5) * 0.2,
+  }));
+
+  function animar() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particulas.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      // Quando sai da tela, não reinjeta — deixa sumir naturalmente
+      if (p.y <= canvas.height) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.cor;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+    });
+    confeteAnimId = requestAnimationFrame(animar);
+  }
+  animar();
+}
+
+function pararConfete() {
+  if (confeteAnimId) { cancelAnimationFrame(confeteAnimId); confeteAnimId = null; }
+  const canvas = document.getElementById('confete-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = 'none';
+}
+
+window.toggleTimer = async function() {
+  if (!filhoData) return;
+  const rodando = filhoData.timerRodando;
+
+  if (rodando) {
+    // Verificar se o timer foi iniciado pelo pai
+    if (filhoData.timerBloqueado) {
+      // Bloquear e avisar o pai
+      await updateDoc(doc(db, 'usuarios', currentUser.uid), {
+        pedidoParadaEm: serverTimestamp()
+      });
+      toast('🔒 Contador bloqueado pelo pai');
+      return;
+    }
+    // Parar: salvar tempo restante
+    const tempoAtual = calcTempoAtual();
+    await updateDoc(doc(db, 'usuarios', currentUser.uid), {
+      timerRodando: false,
+      timerInicio: null,
+      timerIniciadoPor: null,
+      pedidoParada: false,
+      tempoDisponivel: tempoAtual
+    });
+    await addDoc(collection(db, 'historico'), {
+      familiaId: currentUser.familiaId,
+      filhoId: currentUser.uid,
+      tipo: 'contador',
+      descricao: 'Timer pausado pelo filho',
+      tempo: 0,
+      criadoEm: serverTimestamp()
+    });
+    toast('Timer pausado ⏸');
+  } else {
+    if ((filhoData.tempoDisponivel || 0) <= 0) {
+      return toast('Você não tem tempo disponível!');
+    }
+    await updateDoc(doc(db, 'usuarios', currentUser.uid), {
+      timerRodando: true,
+      timerInicio: serverTimestamp(),
+      timerIniciadoPor: 'filho',
+      pedidoParada: false
+    });
+    toast('Timer iniciado ▶');
+  }
+};
+
+// ── MISSÕES ──
+function renderMissoesResumo(missoes) {
+  const ativas = missoes.filter(m => ['pendente','aceita','aguardando_confirmacao'].includes(m.status));
+  const el = document.getElementById('missoes-resumo');
+  if (ativas.length === 0) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--text3);text-align:center;padding:8px">Nenhuma missão ativa</p>';
+    return;
+  }
+  el.innerHTML = ativas.slice(0,3).map(m => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:14px;font-weight:600">${m.titulo}</div>
+      <span class="badge badge-${m.status === 'aguardando_confirmacao' ? 'aguardando' : m.status === 'aceita' ? 'aceita' : 'pendente'}" style="font-size:10px">
+        ${m.status === 'aguardando_confirmacao' ? 'Aguardando' : m.status === 'aceita' ? 'Aceita' : 'Pendente'}
+      </span>
+    </div>
+  `).join('');
+}
+
+function renderMissoes(missoes) {
+  const container = document.getElementById('missoes-lista');
+  if (missoes.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Nenhuma missão</div><div class="empty-desc">Seu pai ainda não criou nenhuma missão.</div></div>`;
+    return;
+  }
+
+  const badgeMap = {
+    pendente: 'badge-pendente', aceita: 'badge-aceita',
+    aguardando_confirmacao: 'badge-aguardando', aprovada: 'badge-aprovada',
+    reprovada: 'badge-reprovada', recusada: 'badge-recusada',
+    nao_cumprida: 'badge-reprovada', sugerida: 'badge-aguardando'
+  };
+  const labelMap = {
+    pendente: '⏳ Pendente', aceita: '🔵 Aceita',
+    aguardando_confirmacao: '🟣 Aguardando confirmação',
+    aprovada: '✅ Aprovada', reprovada: '❌ Reprovada',
+    recusada: '🚫 Recusada', nao_cumprida: '❌ Não cumpri',
+    sugerida: '💡 Sugerida — aguardando pai'
+  };
+
+  const resolvidos = new Set(['aprovada','reprovada','recusada','nao_cumprida']);
+  const ocultas = getMissoesOcultas();
+  container.innerHTML = missoes.filter(m => !ocultas.has(m.id)).map(m => {
+    const podeCumprir = m.status === 'aceita';
+    const podeAceitar = m.status === 'pendente';
+    const resolvido = resolvidos.has(m.status);
+    return `
+    <div class="missao-card" data-missao-id="${m.id}">
+      <div class="missao-header">
+        <div style="flex:1">
+          <div class="missao-titulo">${m.titulo}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="badge ${badgeMap[m.status] || 'badge-pendente'}">${labelMap[m.status] || m.status}</span>
+          ${resolvido ? `<button onclick="apagarMissao('${m.id}')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);padding:2px 4px" title="Apagar">🗑️</button>` : ''}
+        </div>
+      </div>
+      ${m.descricao ? `<div class="missao-desc">${m.descricao}</div>` : ''}
+      <div class="missao-tempos">
+        <div class="tempo-chip ganho">✅ +${formatarMin(m.tempoGanho)}</div>
+        <div class="tempo-chip perde">❌ -${formatarMin(m.tempoPerde)}</div>
+      </div>
+      ${podeAceitar ? `
+      <div class="missao-actions">
+        <button class="btn-small btn-gray" style="flex:1" onclick="responderMissaoFilho('${m.id}','recusar')">Recusar</button>
+        <button class="btn-small btn-blue" style="flex:1" onclick="responderMissaoFilho('${m.id}','aceitar')">Aceitar missão</button>
+      </div>` : ''}
+      ${podeCumprir ? `
+      <div class="missao-actions">
+        <button class="btn-small btn-red" style="flex:1" onclick="naoCumprirMissao('${m.id}')">❌ Não cumpri</button>
+        <button class="btn-small btn-green" style="flex:1" onclick="cumprirMissao('${m.id}')">✅ Cumpri!</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+window.sugerirMissao = async function() {
+  const titulo = document.getElementById('sug-titulo').value.trim();
+  const desc = document.getElementById('sug-desc').value.trim();
+  const ganho = parseInt(document.getElementById('sug-ganho').value) || 0;
+  const perde = parseInt(document.getElementById('sug-perde').value) || 0;
+  if (!titulo) return toast('Informe o título da missão');
+  await addDoc(collection(db, 'missoes'), {
+    familiaId: currentUser.familiaId,
+    filhoId: currentUser.uid,
+    titulo,
+    descricao: desc,
+    tempoGanho: ganho * 60,
+    tempoPerde: perde * 60,
+    status: 'sugerida',
+    sugeridaPeloFilho: true,
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-sugerir-missao');
+  document.getElementById('sug-titulo').value = '';
+  document.getElementById('sug-desc').value = '';
+  document.getElementById('sug-ganho').value = '';
+  document.getElementById('sug-perde').value = '';
+  toast('Sugestão enviada para o pai! 💡');
+};
+
+window.responderMissaoFilho = async function(missaoId, acao) {
+  await updateDoc(doc(db, 'missoes', missaoId), {
+    status: acao === 'aceitar' ? 'aceita' : 'recusada'
+  });
+  toast(acao === 'aceitar' ? 'Missão aceita! Boa sorte 💪' : 'Missão recusada');
+};
+
+function getMissoesOcultas() {
+  return new Set(JSON.parse(localStorage.getItem(`missoes_ocultas_${currentUser.uid}`) || '[]'));
+}
+function salvarMissaoOculta(missaoId) {
+  const ocultas = getMissoesOcultas();
+  ocultas.add(missaoId);
+  localStorage.setItem(`missoes_ocultas_${currentUser.uid}`, JSON.stringify([...ocultas]));
+}
+
+window.apagarMissao = function(missaoId) {
+  salvarMissaoOculta(missaoId);
+  document.querySelector(`[data-missao-id="${missaoId}"]`)?.remove();
+  toast('Missão removida 🗑️');
+};
+
+window.cumprirMissao = async function(missaoId) {
+  await updateDoc(doc(db, 'missoes', missaoId), {
+    status: 'aguardando_confirmacao',
+    cumpridoEm: serverTimestamp()
+  });
+  toast('Aviso enviado para o pai! Aguardando confirmação 🟣');
+};
+
+window.naoCumprirMissao = async function(missaoId) {
+  const snap = await getDoc(doc(db, 'missoes', missaoId));
+  if (!snap.exists()) return;
+  const m = snap.data();
+  await updateDoc(doc(db, 'missoes', missaoId), {
+    status: 'nao_cumprida',
+    naoConcluidoEm: serverTimestamp()
+  });
+  await updateDoc(doc(db, 'usuarios', currentUser.uid), {
+    tempoDisponivel: increment(-m.tempoPerde)
+  });
+  await addDoc(collection(db, 'historico'), {
+    familiaId: currentUser.familiaId,
+    filhoId: currentUser.uid,
+    tipo: 'missao',
+    descricao: `Missão não cumprida: ${m.titulo}`,
+    tempo: -m.tempoPerde,
+    criadoEm: serverTimestamp()
+  });
+  const min = Math.round(m.tempoPerde / 60);
+  toast(`-${min}min descontados por não cumprir a missão`);
+};
+
+// ── TAREFAS ──
+const hoje = new Date().toDateString();
+
+function renderTarefasResumo(tarefas) {
+  const el = document.getElementById('tarefas-resumo');
+  if (tarefas.length === 0) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--text3);text-align:center;padding:8px">Nenhuma tarefa hoje</p>';
+    return;
+  }
+  const pendentes = tarefas.filter(t => !t.statusHoje?.[hoje] || t.statusHoje[hoje] === 'pendente');
+  el.innerHTML = `<p style="font-size:14px;color:var(--text2);text-align:center;padding:4px">
+    ${pendentes.length > 0 ? `<span style="color:var(--yellow)">${pendentes.length} pendente${pendentes.length>1?'s':''}</span>` : '<span style="color:var(--green)">Todas concluídas! 🎉</span>'}
+    de ${tarefas.length} tarefa${tarefas.length>1?'s':''}
+  </p>`;
+}
+
+function renderTarefas(tarefas) {
+  const container = document.getElementById('tarefas-lista');
+  if (tarefas.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Nenhuma tarefa hoje</div></div>`;
+    return;
+  }
+  container.innerHTML = tarefas.map(t => {
+    const status = t.statusHoje?.[hoje] || 'pendente';
+    const emoji = status === 'cumprida' ? '✅' : status === 'nao_cumprida' ? '❌' : '⭕';
+    return `
+    <div class="tarefa-item">
+      <div class="tarefa-check ${status}" onclick="abrirConfirmarTarefa('${t.id}','${t.titulo}',${t.tempoGanho})">
+        ${emoji}
+      </div>
+      <div class="tarefa-info">
+        <div class="tarefa-nome" style="${status==='cumprida'?'text-decoration:line-through;color:var(--text3)':''}">${t.titulo}</div>
+        <div class="tarefa-tempo ${status==='cumprida'?'':''}">
+          <span style="color:var(--green)">+${formatarMin(t.tempoGanho)}</span>
+          <span style="color:var(--text3)"> · </span>
+          <span style="color:var(--red)">-${formatarMin(t.tempoPerde)}</span>
+        </div>
+      </div>
+      ${status === 'pendente' ? `<button class="btn-small btn-blue" onclick="abrirConfirmarTarefa('${t.id}','${t.titulo}',${t.tempoGanho})">Feita!</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+window.abrirConfirmarTarefa = function(id, titulo, ganho) {
+  const status = document.querySelector(`[onclick*="'${id}'"]`)?.closest('.tarefa-item')?.querySelector('.tarefa-check')?.className;
+  if (status?.includes('cumprida')) return;
+  document.getElementById('confirmar-tarefa-id').value = id;
+  document.getElementById('confirmar-tarefa-info').innerHTML = `
+    <div style="background:var(--bg);border-radius:10px;padding:12px;border:1px solid var(--border)">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">${titulo}</div>
+      <div style="font-size:13px;color:var(--green)">+${formatarMin(ganho)} se confirmado pelo pai</div>
+    </div>`;
+  abrirModal('modal-confirmar-tarefa');
+};
+
+window.confirmarTarefaCumprida = async function() {
+  const id = document.getElementById('confirmar-tarefa-id').value;
+  const field = `statusHoje.${hoje}`;
+  await updateDoc(doc(db, 'tarefas_diarias', id), { [field]: 'cumprida' });
+  await addDoc(collection(db, 'notificacoes'), {
+    destinatarioTipo: 'pai',
+    familiaId: currentUser.familiaId,
+    filhoId: currentUser.uid,
+    filhoNome: currentUser.nome,
+    tipo: 'tarefa_cumprida',
+    tarefaId: id,
+    lida: false,
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-confirmar-tarefa');
+  toast('Aviso enviado para o pai! ✅');
+};
+
+// ── PEDIDOS ──
+window.enviarPedido = async function() {
+  const motivo = document.getElementById('pedido-motivo').value.trim();
+  const min = parseInt(document.getElementById('pedido-min').value);
+  if (!motivo || !min) return toast('Preencha todos os campos');
+  await addDoc(collection(db, 'pedidos'), {
+    familiaId: currentUser.familiaId,
+    filhoId: currentUser.uid,
+    filhoNome: currentUser.nome,
+    motivo,
+    tempoPedido: min * 60,
+    status: 'pendente',
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-novo-pedido');
+  document.getElementById('pedido-motivo').value = '';
+  document.getElementById('pedido-min').value = '';
+  toast('Pedido enviado! Aguarde resposta 📬');
+};
+
+function renderPedidos(pedidos) {
+  const container = document.getElementById('pedidos-lista');
+  if (pedidos.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📬</div><div class="empty-title">Nenhum pedido</div><div class="empty-desc">Faça um pedido de tempo extra para seus pais.</div></div>`;
+    return;
+  }
+  const statusLabel = { pendente: '⏳ Aguardando', aprovado: '✅ Aprovado', reprovado: '❌ Negado' };
+  const statusBadge = { pendente: 'badge-pendente', aprovado: 'badge-aprovada', reprovado: 'badge-reprovada' };
+  container.innerHTML = pedidos.map(p => `
+    <div class="pedido-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;flex:1">${p.motivo}</div>
+        <span class="badge ${statusBadge[p.status] || 'badge-pendente'}">${statusLabel[p.status] || p.status}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2)">Pedindo: <span style="color:var(--purple);font-weight:600">${formatarMin(p.tempoPedido)}</span></div>
+    </div>`).join('');
+}
+
+// ── HISTÓRICO ──
+function renderHistorico(hist) {
+  const container = document.getElementById('historico-lista');
+  if (hist.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Sem histórico</div></div>`;
+    return;
+  }
+  container.innerHTML = hist.map(h => {
+    const positivo = h.tempo > 0;
+    const tempoMin = Math.abs(Math.round(h.tempo / 60));
+    return `
+    <div class="hist-item">
+      <div>
+        <div style="font-size:14px;font-weight:600">${h.descricao || h.tipo}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${formatarData(h.criadoEm)}</div>
+      </div>
+      ${h.tempo !== 0 ? `<span style="font-weight:700;font-size:16px;color:${positivo?'var(--green)':'var(--red)'}">
+        ${positivo?'+':'-'}${tempoMin}min
+      </span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function formatarData(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+// ── NOTIFICAÇÃO DE PERDA ──
+let perdaAutoCloseTimer = null;
+
+function mostrarPerda(tempoSeg, motivo) {
+  const min = Math.round(Math.abs(tempoSeg) / 60);
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  const tempoStr = h > 0 ? `-${h}h${m ? m + 'min' : ''}` : `-${min}min`;
+
+  const emoji = motivo.toLowerCase().includes('multa') ? '🚫' :
+                motivo.toLowerCase().includes('missão') ? '😓' : '😢';
+
+  document.getElementById('perda-emoji').textContent = emoji;
+  document.getElementById('perda-tempo').textContent = tempoStr;
+  document.getElementById('perda-motivo').textContent = motivo;
+  document.getElementById('perda-overlay').classList.add('show');
+
+  clearTimeout(perdaAutoCloseTimer);
+  perdaAutoCloseTimer = setTimeout(() => fecharPerda(), 6000);
+}
+
+window.fecharPerda = function() {
+  clearTimeout(perdaAutoCloseTimer);
+  document.getElementById('perda-overlay').classList.remove('show');
+};
+
+// ── BADGE MISSÕES ──
+function mostrarBadgeMissoes(qtd) {
+  const el = document.getElementById('badge-missoes');
+  el.textContent = qtd > 9 ? '9+' : qtd;
+  el.style.display = 'flex';
+}
+window.limparBadgeMissoes = function() {
+  const el = document.getElementById('badge-missoes');
+  el.style.display = 'none';
+};
+
+// ── NAVEGAÇÃO ──
+let paginaAtual = 0;
+const TOTAL_PAGINAS = 5;
+
+window.irParaPagina = function(n) {
+  paginaAtual = n;
+  const el = document.getElementById('pages-scroll');
+  el.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+  el.style.transform = `translateX(-${n * 100}%)`;
+  document.querySelectorAll('.nav-item').forEach((btn, i) => btn.classList.toggle('active', i === n));
+};
+
+(function() {
+  const wrapper = document.getElementById('pages-scroll').parentElement;
+  let startX = 0, startY = 0, dragging = false;
+
+  function onStart(x, y) { startX = x; startY = y; dragging = true; }
+  function onMove(x) {
+    if (!dragging) return;
+    const dx = x - startX;
+    const el = document.getElementById('pages-scroll');
+    el.style.transition = 'none';
+    el.style.transform = `translateX(calc(-${paginaAtual * 100}% + ${dx}px))`;
+  }
+  function onEnd(x) {
+    if (!dragging) return;
+    dragging = false;
+    const dx = x - startX;
+    const el = document.getElementById('pages-scroll');
+    if (Math.abs(dx) > 60) {
+      const nova = dx < 0
+        ? Math.min(paginaAtual + 1, TOTAL_PAGINAS - 1)
+        : Math.max(paginaAtual - 1, 0);
+      irParaPagina(nova);
+    } else {
+      el.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+      el.style.transform = `translateX(-${paginaAtual * 100}%)`;
+    }
+  }
+
+  // Touch
+  wrapper.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  wrapper.addEventListener('touchmove', e => {
+    const dx = Math.abs(e.touches[0].clientX - startX);
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    if (dx > dy) onMove(e.touches[0].clientX);
+  }, { passive: true });
+  wrapper.addEventListener('touchend', e => onEnd(e.changedTouches[0].clientX));
+
+  // Mouse
+  wrapper.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
+  wrapper.addEventListener('mousemove', e => { if (dragging) onMove(e.clientX); });
+  wrapper.addEventListener('mouseup', e => onEnd(e.clientX));
+  wrapper.addEventListener('mouseleave', e => { if (dragging) onEnd(e.clientX); });
+})();
+
+// ── MODAIS ──
+window.abrirModal = function(id) { document.getElementById(id).classList.add('open'); };
+window.fecharModal = function(id) { document.getElementById(id).classList.remove('open'); };
+
+// ── LOGOUT ──
+window.fazerLogout = async function() {
+  clearInterval(timerInterval);
+  unsubscribers.forEach(u => u());
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

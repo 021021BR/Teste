@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TempoTela — Pais</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #273449;
+  --border: #334155;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --purple: #a855f7;
+  --nav-h: 64px;
+  --top-h: 56px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── PHONE SHELL ── */
+.phone {
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  height: var(--top-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #fff;
+}
+.topbar-name { font-size: 15px; font-weight: 600; }
+.topbar-sub { font-size: 12px; color: var(--text2); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: var(--text2);
+  transition: background 0.15s;
+}
+.icon-btn:hover { background: var(--surface2); }
+.notif-badge {
+  position: relative;
+}
+.notif-badge::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  display: none;
+}
+.notif-badge.has-notif::after { display: block; }
+
+/* ── PAGES WRAPPER ── */
+.pages-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.pages-scroll {
+  display: flex;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  will-change: transform;
+}
+.page {
+  min-width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 16px 24px;
+  scroll-behavior: smooth;
+}
+.page::-webkit-scrollbar { width: 4px; }
+.page::-webkit-scrollbar-track { background: transparent; }
+.page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ── BOTTOM NAV ── */
+.bottomnav {
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 8px 4px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  transition: color 0.15s;
+  position: relative;
+}
+.nav-item.active { color: var(--blue); }
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%; transform: translateX(-50%);
+  width: 36px; height: 30px;
+  background: rgba(59,130,246,0.15);
+  border-radius: 10px;
+}
+.nav-icon { font-size: 22px; line-height: 1; position: relative; z-index: 1; }
+.nav-label { font-size: 10px; font-weight: 500; white-space: nowrap; }
+.nav-item { position: relative; }
+.nav-badge {
+  position: absolute; top: 6px; right: calc(50% - 18px);
+  background: var(--red); color: #fff;
+  font-size: 10px; font-weight: 700;
+  min-width: 16px; height: 16px;
+  border-radius: 8px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 2;
+}
+.nav-item.active .nav-icon {
+  transform: scale(1.15);
+  transition: transform 0.15s;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+.btn-small {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-small:active { opacity: 0.8; }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-red { background: var(--red); color: #fff; }
+.btn-gray { background: var(--surface2); color: var(--text); }
+
+/* ── FILHO CARD (Início) ── */
+.filho-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.filho-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.filho-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.filho-nome { font-size: 14px; font-weight: 700; }
+.filho-status { font-size: 11px; margin-top: 1px; }
+.filho-status.online { color: var(--green); }
+.filho-status.offline { color: var(--text3); }
+
+.tempo-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  margin-bottom: 8px;
+}
+.tempo-valor {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+.tempo-valor.positivo { color: var(--green); }
+.tempo-valor.negativo { color: var(--red); }
+.tempo-valor.zero { color: var(--text2); }
+.tempo-label { display: none; }
+.timer-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #16a34a22;
+  color: var(--green);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.timer-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.filho-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.filho-actions .btn-action {
+  padding: 7px 4px;
+  border-radius: 8px;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-add-tempo { background: #16a34a22; color: var(--green); border: 1px solid #16a34a55; }
+.btn-rem-tempo { background: #dc262622; color: var(--red); border: 1px solid #dc262655; }
+.btn-multa { background: #d9770622; color: var(--yellow); border: 1px solid #d9770655; }
+.btn-congelar { background: #6366f122; color: #818cf8; border: 1px solid #6366f155; }
+
+/* ── MISSÃO CARD ── */
+.missao-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.missao-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.missao-titulo { font-size: 15px; font-weight: 600; }
+.missao-filho { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.badge-pendente { background: #f59e0b22; color: var(--yellow); }
+.badge-aceita { background: #3b82f622; color: var(--blue); }
+.badge-aguardando { background: #a855f722; color: var(--purple); }
+.badge-aprovada { background: #22c55e22; color: var(--green); }
+.badge-reprovada { background: #ef444422; color: var(--red); }
+.badge-recusada { background: #64748b22; color: var(--text3); }
+
+.missao-tempos {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.tempo-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.tempo-chip.ganho { color: var(--green); }
+.tempo-chip.perde { color: var(--red); }
+
+.missao-actions { display: flex; gap: 8px; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 4px; }
+.empty-desc { font-size: 13px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%;
+  max-width: 430px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  border-top: 1px solid var(--border);
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.modal-overlay.open .modal {
+  transform: translateY(0);
+}
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form-group { margin-bottom: 14px; }
+label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+input, select, textarea {
+  width: 100%;
+  padding: 11px 13px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+textarea { resize: vertical; min-height: 80px; }
+input:focus, select:focus, textarea:focus { border-color: var(--blue); }
+select option { background: var(--surface); }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.btn-full {
+  flex: 1;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-full:active { opacity: 0.8; }
+
+/* ── TEMPO INPUT ROW ── */
+.tempo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ── CÓDIGO FAMÍLIA ── */
+.codigo-familia {
+  background: var(--bg);
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.codigo-valor {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--blue);
+  font-family: monospace;
+}
+.codigo-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+/* ── LOADING ── */
+.page-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text2);
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: var(--surface2);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.25s;
+  white-space: nowrap;
+  max-width: 90vw;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Destaque na confirmação de missão */
+.confirm-box {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  margin: 12px 0;
+  border: 1px solid var(--border);
+}
+.confirm-box p { font-size: 14px; color: var(--text2); margin-bottom: 4px; }
+.confirm-box strong { color: var(--text); font-size: 15px; }
+
+/* Saldo input rápido */
+.saldo-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.saldo-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 0;
+}
+.saldo-unit { color: var(--text2); font-size: 14px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-avatar" id="topbar-inicial">P</div>
+      <div>
+        <div class="topbar-name" id="topbar-nome">Carregando...</div>
+        <div class="topbar-sub">App dos Pais</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn notif-badge" id="btn-notif" onclick="abrirModal('modal-notif')" title="Notificações">🔔</button>
+      <button class="icon-btn" onclick="fazerLogout()" title="Sair" style="display:flex;align-items:center;justify-content:center">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 3C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h7v-2H5V5h7V3H5z"/>
+    <path d="M16.5 8.5L15.09 9.91 17.17 12H9v2h8.17l-2.08 2.09L16.5 17.5 21 13l-4.5-4.5z"/>
+  </svg>
+</button>
+    </div>
+  </div>
+
+  <!-- PÁGINAS -->
+  <div class="pages-wrapper">
+    <div class="pages-scroll" id="pages-scroll">
+
+      <!-- PÁGINA 0: INÍCIO -->
+      <div class="page" id="page-inicio">
+        <div class="section-header">
+          <div class="section-title">Meus filhos</div>
+        </div>
+        <div id="filhos-lista">
+          <div class="page-loading"><div class="spinner"></div><p>Carregando...</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px 12px;margin-top:4px">
+          <div style="flex:1">
+            <div style="font-size:10px;color:var(--text3);margin-bottom:2px">Código da família</div>
+            <div class="codigo-valor" id="codigo-familia-val" style="font-size:20px;letter-spacing:3px">------</div>
+          </div>
+          <button class="btn-small btn-gray" onclick="copiarCodigo()" style="flex-shrink:0">📋 Copiar</button>
+        </div>
+      </div>
+
+      <!-- PÁGINA 1: MISSÕES -->
+      <div class="page" id="page-missoes">
+        <div class="section-header">
+          <div class="section-title">Missões</div>
+          <button class="btn-small btn-blue" onclick="abrirModal('modal-nova-missao')">+ Nova</button>
+        </div>
+        <div id="missoes-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 2: TAREFAS DIÁRIAS -->
+      <div class="page" id="page-tarefas">
+        <div class="section-header">
+          <div class="section-title">Tarefas Diárias</div>
+          <button class="btn-small btn-blue" onclick="abrirModal('modal-nova-tarefa')">+ Nova</button>
+        </div>
+        <div id="tarefas-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 3: PEDIDOS -->
+      <div class="page" id="page-pedidos">
+        <div class="section-header">
+          <div class="section-title">Pedidos</div>
+        </div>
+        <div id="pedidos-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 4: BÔNUS E MULTAS -->
+      <div class="page" id="page-bonus">
+        <div class="section-header">
+          <div class="section-title">Bônus e Multas</div>
+        </div>
+        <div id="bonus-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 5: HISTÓRICO -->
+      <div class="page" id="page-historico">
+        <div class="section-header">
+          <div class="section-title">Histórico</div>
+        </div>
+        <div id="historico-lista">
+          <div class="page-loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottomnav">
+    <button class="nav-item active" data-page="0" onclick="irParaPagina(0)">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Início</span>
+    </button>
+    <button class="nav-item" data-page="1" onclick="irParaPagina(1);limparBadgeMissoes()">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-label">Missões</span>
+      <span class="nav-badge" id="badge-missoes" style="display:none">!</span>
+    </button>
+    <button class="nav-item" data-page="2" onclick="irParaPagina(2)">
+      <span class="nav-icon">✅</span>
+      <span class="nav-label">Tarefas</span>
+    </button>
+    <button class="nav-item" data-page="3" onclick="irParaPagina(3)">
+      <span class="nav-icon">📬</span>
+      <span class="nav-label">Pedidos</span>
+    </button>
+    <button class="nav-item" data-page="4" onclick="irParaPagina(4)">
+      <span class="nav-icon">⭐</span>
+      <span class="nav-label">Bônus</span>
+    </button>
+    <button class="nav-item" data-page="5" onclick="irParaPagina(5)">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Histórico</span>
+    </button>
+  </div>
+
+</div><!-- /phone -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL: NOTIFICAÇÕES -->
+<div class="modal-overlay" id="modal-notif" onclick="fecharModal('modal-notif')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Notificações</div>
+    <div id="notif-lista">
+      <div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-title">Sem notificações</div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-notif')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADICIONAR TEMPO -->
+<div class="modal-overlay" id="modal-add-tempo" onclick="fecharModal('modal-add-tempo')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-add-tempo-titulo">Adicionar tempo</div>
+    <input type="hidden" id="modal-add-tempo-uid">
+    <div class="form-group">
+      <label>Minutos</label>
+      <div class="saldo-input-row">
+        <input type="number" id="add-tempo-min" placeholder="30" min="1" max="999">
+        <span class="saldo-unit">minutos</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Motivo (opcional)</label>
+      <input type="text" id="add-tempo-motivo" placeholder="Ex: Bom comportamento">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-add-tempo')">Cancelar</button>
+      <button class="btn-full" style="background:var(--green);color:#fff" onclick="confirmarAddTempo()">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REMOVER TEMPO -->
+<div class="modal-overlay" id="modal-rem-tempo" onclick="fecharModal('modal-rem-tempo')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-rem-tempo-titulo">Remover tempo</div>
+    <input type="hidden" id="modal-rem-tempo-uid">
+    <div class="form-group">
+      <label>Minutos</label>
+      <div class="saldo-input-row">
+        <input type="number" id="rem-tempo-min" placeholder="15" min="1" max="999">
+        <span class="saldo-unit">minutos</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Motivo (opcional)</label>
+      <input type="text" id="rem-tempo-motivo" placeholder="Ex: Não fez a lição">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-rem-tempo')">Cancelar</button>
+      <button class="btn-full" style="background:var(--red);color:#fff" onclick="confirmarRemTempo()">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MULTA POR NÃO ATIVAR CONTADOR -->
+<div class="modal-overlay" id="modal-multa" onclick="fecharModal('modal-multa')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Multa — contador não ativado</div>
+    <input type="hidden" id="modal-multa-uid">
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">O filho usou tela sem ligar o contador. Informe o tempo de uso e a multa adicional.</p>
+    <div class="tempo-row">
+      <div class="form-group">
+        <label>Tempo usado (min)</label>
+        <input type="number" id="multa-uso-min" placeholder="20" min="0">
+      </div>
+      <div class="form-group">
+        <label>Multa adicional (min)</label>
+        <input type="number" id="multa-extra-min" placeholder="10" min="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-multa')">Cancelar</button>
+      <button class="btn-full" style="background:var(--yellow);color:#000" onclick="confirmarMulta()">Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVA MISSÃO -->
+<div class="modal-overlay" id="modal-nova-missao" onclick="fecharModal('modal-nova-missao')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nova Missão</div>
+    <div class="form-group">
+      <label>Para qual filho?</label>
+      <select id="missao-filho-sel"></select>
+    </div>
+    <div class="form-group">
+      <label>Título da missão</label>
+      <input type="text" id="missao-titulo" placeholder="Ex: Arrumar o quarto">
+    </div>
+    <div class="form-group">
+      <label>Descrição (opcional)</label>
+      <textarea id="missao-desc" placeholder="Descreva o que precisa ser feito..."></textarea>
+    </div>
+    <div class="tempo-row">
+      <div class="form-group">
+        <label>✅ Ganha (min)</label>
+        <input type="number" id="missao-ganho" placeholder="30" min="0">
+      </div>
+      <div class="form-group">
+        <label>❌ Perde (min)</label>
+        <input type="number" id="missao-perde" placeholder="15" min="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-nova-missao')">Cancelar</button>
+      <button class="btn-full btn-blue" onclick="criarMissao()">Criar Missão</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR MISSÃO (filho disse que cumpriu) -->
+<div class="modal-overlay" id="modal-confirmar-missao" onclick="fecharModal('modal-confirmar-missao')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Confirmar missão</div>
+    <input type="hidden" id="confirmar-missao-id">
+    <div id="confirmar-missao-info"></div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px">O filho informou que cumpriu esta missão. Você confirma?</p>
+    <div class="modal-actions">
+      <button class="btn-full" style="background:var(--red);color:#fff" onclick="responderMissao(false)">❌ Não cumpriu</button>
+      <button class="btn-full" style="background:var(--green);color:#fff" onclick="responderMissao(true)">✅ Cumpriu!</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOVA TAREFA DIÁRIA -->
+<div class="modal-overlay" id="modal-nova-tarefa" onclick="fecharModal('modal-nova-tarefa')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nova Tarefa Diária</div>
+    <div class="form-group">
+      <label>Para qual filho?</label>
+      <select id="tarefa-filho-sel"></select>
+    </div>
+    <div class="form-group">
+      <label>Nome da tarefa</label>
+      <input type="text" id="tarefa-titulo" placeholder="Ex: Escovar os dentes">
+    </div>
+    <div class="tempo-row">
+      <div class="form-group">
+        <label>✅ Ganha (min)</label>
+        <input type="number" id="tarefa-ganho" placeholder="15" min="0">
+      </div>
+      <div class="form-group">
+        <label>❌ Perde (min)</label>
+        <input type="number" id="tarefa-perde" placeholder="10" min="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-full btn-gray" onclick="fecharModal('modal-nova-tarefa')">Cancelar</button>
+      <button class="btn-full btn-blue" onclick="criarTarefa()">Criar Tarefa</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc,
+  collection, query, where, onSnapshot, orderBy, getDocs,
+  serverTimestamp, increment, Timestamp
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCnpDlP0ZsnwXgB7D5YTL5n0-ZpWO42aCA",
+  authDomain: "tempotela-36229.firebaseapp.com",
+  projectId: "tempotela-36229",
+  storageBucket: "tempotela-36229.firebasestorage.app",
+  messagingSenderId: "505204192519",
+  appId: "1:505204192519:web:844e29d8340f7fb93081a2"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentFamiliaId = null;
+let currentUserId = null;
+let filhosData = {};
+let unsubscribers = [];
+
+// ── AUTH ──
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  const snap = await getDoc(doc(db, 'usuarios', user.uid));
+  if (!snap.exists() || snap.data().tipo !== 'pai') {
+    await signOut(auth);
+    window.location.href = 'index.html';
+    return;
+  }
+  currentUser = { uid: user.uid, ...snap.data() };
+  currentFamiliaId = currentUser.familiaId;
+  currentUserId = user.uid;
+
+  document.getElementById('topbar-nome').textContent = currentUser.nome;
+  document.getElementById('topbar-inicial').textContent = currentUser.nome[0].toUpperCase();
+  document.getElementById('codigo-familia-val').textContent = currentFamiliaId.substring(0, 6).toUpperCase();
+
+  iniciarListeners();
+});
+
+function iniciarListeners() {
+  // Filhos em tempo real
+  const familiaRef = doc(db, 'familias', currentFamiliaId);
+  let filhoListeners = [];
+  const u1 = onSnapshot(familiaRef, (snap) => {
+    if (!snap.exists()) return;
+    const filhoIds = snap.data().filhos || [];
+    if (filhoIds.length === 0) {
+      renderFilhos([]);
+      return;
+    }
+    // Cancelar listeners antigos de filhos
+    filhoListeners.forEach(u => u());
+    filhoListeners = [];
+    // Criar listener em tempo real para cada filho
+    filhoIds.forEach(id => {
+      const unsub = onSnapshot(doc(db, 'usuarios', id), (filhoSnap) => {
+        if (!filhoSnap.exists()) return;
+        const dadosAntigos = filhosData[filhoSnap.id];
+        const dadosNovos = { uid: filhoSnap.id, ...filhoSnap.data() };
+        filhosData[filhoSnap.id] = dadosNovos;
+        renderFilhos(Object.values(filhosData));
+        preencherSelectFilhos();
+        // Detectar pedido de parada do filho
+        const tsNovo = dadosNovos.pedidoParadaEm?.seconds;
+        const tsAntigo = dadosAntigos?.pedidoParadaEm?.seconds;
+        if (tsNovo && tsNovo !== tsAntigo) {
+          toast(`⚠️ ${dadosNovos.nome} quer parar o contador!`);
+        }
+      });
+      filhoListeners.push(unsub);
+    });
+  });
+  unsubscribers.push(u1);
+  unsubscribers.push(() => filhoListeners.forEach(u => u()));
+
+  // Missões em tempo real
+  let missoesStatusConhecido = {};
+  let missoesCarregadasInicial = false;
+  const missaoQ = query(
+    collection(db, 'missoes'),
+    where('familiaId', '==', currentFamiliaId)
+  );
+  const u2 = onSnapshot(missaoQ, snap => {
+    const missoes = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.criadoEm?.seconds || 0) - (a.criadoEm?.seconds || 0));
+    renderMissoes(missoes);
+
+    if (!missoesCarregadasInicial) {
+      missoes.forEach(m => { missoesStatusConhecido[m.id] = m.status; });
+      missoesCarregadasInicial = true;
+    } else {
+      missoes.forEach(m => {
+        const statusAnterior = missoesStatusConhecido[m.id];
+        const statusAtual = m.status;
+        missoesStatusConhecido[m.id] = statusAtual;
+
+        const filho = filhosData[m.filhoId];
+        const nome = filho ? filho.nome : 'Filho';
+
+        if (statusAnterior === undefined) {
+          // Missão nova chegou enquanto o pai estava com o app aberto
+          if (statusAtual === 'sugerida') {
+            notificarMissao(`💡 ${nome} sugeriu uma missão: "${m.titulo}"`);
+          }
+          return;
+        }
+        if (statusAnterior === statusAtual) return;
+
+        if (statusAtual === 'aceita') {
+          notificarMissao(`🎯 ${nome} aceitou a missão "${m.titulo}"`);
+        } else if (statusAtual === 'aguardando_confirmacao') {
+          notificarMissao(`✅ ${nome} diz que cumpriu "${m.titulo}"`);
+        } else if (statusAtual === 'nao_cumprida') {
+          notificarMissao(`❌ ${nome} avisou que não cumpriu "${m.titulo}"`);
+        } else if (statusAtual === 'recusada') {
+          notificarMissao(`🚫 ${nome} recusou a missão "${m.titulo}"`);
+        }
+      });
+    }
+  });
+  unsubscribers.push(u2);
+
+  // Tarefas diárias
+  const tarefaQ = query(
+    collection(db, 'tarefas_diarias'),
+    where('familiaId', '==', currentFamiliaId)
+  );
+  const u3 = onSnapshot(tarefaQ, snap => {
+    const tarefas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTarefas(tarefas);
+  });
+  unsubscribers.push(u3);
+
+  // Histórico
+  const histQ = query(
+    collection(db, 'historico'),
+    where('familiaId', '==', currentFamiliaId)
+  );
+  const u4 = onSnapshot(histQ, snap => {
+    const hist = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.criadoEm?.seconds || 0) - (a.criadoEm?.seconds || 0));
+    renderHistorico(hist);
+  });
+  unsubscribers.push(u4);
+}
+
+// ── RENDER: FILHOS ──
+function renderFilhos(filhos) {
+  const container = document.getElementById('filhos-lista');
+  if (filhos.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">👶</div>
+        <div class="empty-title">Nenhum filho cadastrado</div>
+        <div class="empty-desc">Compartilhe o código da família com seus filhos para eles entrarem.</div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filhos.map(f => {
+    const tempoSeg = calcTempoAtual(f);
+    const tempoStr = formatarTempo(tempoSeg);
+    const positivo = tempoSeg > 0;
+    const rodando = f.timerRodando;
+
+    const bloqueado = f.timerBloqueado || false;
+    return `
+    <div class="filho-card" data-uid="${f.uid}">
+      <div class="filho-card-header">
+        <div class="filho-avatar">${f.nome[0].toUpperCase()}</div>
+        <div style="flex:1">
+          <div class="filho-nome">${f.nome}</div>
+          <div class="filho-status ${rodando ? 'online' : 'offline'}">
+            ${rodando ? '▶ Contador ativo' : '⏸ Parado'}
+          </div>
+        </div>
+        <button onclick="toggleBloqueio('${f.uid}','${bloqueado}')" title="${bloqueado ? 'Filho não pode parar' : 'Filho pode parar'}"
+          style="background:${bloqueado ? '#ef444422' : '#22c55e22'};border:1px solid ${bloqueado ? 'var(--red)' : 'var(--green)'};border-radius:8px;padding:4px 8px;cursor:pointer;font-size:14px">
+          ${bloqueado ? '🔒' : '🔓'}
+        </button>
+      </div>
+      <div class="tempo-display">
+        <div class="tempo-valor ${tempoSeg > 300 ? 'positivo' : tempoSeg <= 0 ? 'zero' : 'negativo'}" data-tempo-uid="${f.uid}">${tempoStr}</div>
+        <div class="tempo-label">tempo disponível</div>
+        ${rodando ? '<div class="timer-indicator"><div class="timer-dot"></div>Descontando agora</div>' : ''}
+      </div>
+      <div class="filho-actions">
+        <button class="btn-action btn-add-tempo" onclick="abrirAddTempo('${f.uid}','${f.nome}')">➕ Adicionar</button>
+        <button class="btn-action btn-rem-tempo" onclick="abrirRemTempo('${f.uid}','${f.nome}')">➖ Remover</button>
+        <button class="btn-action btn-multa" onclick="abrirMulta('${f.uid}','${f.nome}')">⚠️ Multa</button>
+        <button class="btn-action btn-congelar" onclick="congelarTimer('${f.uid}','${rodando}')">
+          ${rodando ? '⏸ Parar timer' : '▶ Iniciar timer'}
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function calcTempoAtual(filho) {
+  let tempo = filho.tempoDisponivel || 0;
+  if (filho.timerRodando && filho.timerInicio) {
+    const inicio = filho.timerInicio.toDate ? filho.timerInicio.toDate() : new Date(filho.timerInicio);
+    const elapsed = Math.floor((Date.now() - inicio.getTime()) / 1000);
+    tempo -= elapsed;
+  }
+  return tempo;
+}
+
+function formatarTempo(segundos) {
+  const abs = Math.abs(segundos);
+  const h = Math.floor(abs / 3600);
+  const m = Math.floor((abs % 3600) / 60);
+  const s = abs % 60;
+  const neg = segundos < 0 ? '-' : '';
+  if (h > 0) return `${neg}${h}h ${String(m).padStart(2,'0')}m`;
+  return `${neg}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ── RENDER: MISSÕES ──
+function renderMissoes(missoes) {
+  const container = document.getElementById('missoes-lista');
+  if (missoes.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Nenhuma missão</div><div class="empty-desc">Crie missões para seus filhos!</div></div>`;
+    return;
+  }
+
+  const badgeMap = {
+    pendente: 'badge-pendente',
+    aceita: 'badge-aceita',
+    aguardando_confirmacao: 'badge-aguardando',
+    aprovada: 'badge-aprovada',
+    reprovada: 'badge-reprovada',
+    recusada: 'badge-recusada',
+    nao_cumprida: 'badge-reprovada',
+    sugerida: 'badge-aguardando'
+  };
+  const labelMap = {
+    pendente: 'Pendente',
+    aceita: 'Aceita',
+    aguardando_confirmacao: 'Aguardando confirmação',
+    aprovada: 'Aprovada ✅',
+    reprovada: 'Reprovada ❌',
+    recusada: 'Recusada',
+    nao_cumprida: 'Filho não cumpriu ❌',
+    sugerida: '💡 Sugerida pelo filho'
+  };
+
+  const resolvidos = new Set(['aprovada','reprovada','recusada','nao_cumprida']);
+  const ocultas = getMissoesOcultas();
+  container.innerHTML = missoes.filter(m => !ocultas.has(m.id)).map(m => {
+    const filho = filhosData[m.filhoId];
+    const nomeFilho = filho ? filho.nome : '?';
+    const aguardando = m.status === 'aguardando_confirmacao';
+    const resolvido = resolvidos.has(m.status);
+    return `
+    <div class="missao-card" data-missao-id="${m.id}">
+      <div class="missao-header">
+        <div style="flex:1">
+          <div class="missao-titulo">${m.titulo}</div>
+          <div class="missao-filho">Para: ${nomeFilho}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="badge ${badgeMap[m.status] || 'badge-pendente'}">${labelMap[m.status] || m.status}</span>
+          ${resolvido ? `<button onclick="apagarMissao('${m.id}')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);padding:2px 4px" title="Apagar">🗑️</button>` : ''}
+        </div>
+      </div>
+      ${m.descricao ? `<p style="font-size:13px;color:var(--text2);margin-bottom:8px">${m.descricao}</p>` : ''}
+      <div class="missao-tempos">
+        <div class="tempo-chip ganho">✅ +${formatarMin(m.tempoGanho)}</div>
+        <div class="tempo-chip perde">❌ -${formatarMin(m.tempoPerde)}</div>
+      </div>
+      ${m.status === 'sugerida' ? `
+      <div class="missao-actions">
+        <button class="btn-small btn-gray" style="flex:1" onclick="responderSugestao('${m.id}','recusar')">Recusar</button>
+        <button class="btn-small btn-blue" style="flex:1" onclick="responderSugestao('${m.id}','aceitar')">Aceitar missão</button>
+      </div>` : ''}
+      ${aguardando ? `
+      <div class="missao-actions">
+        <button class="btn-small btn-blue" style="flex:1" onclick="abrirConfirmarMissao('${m.id}')">Confirmar resultado</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER: TAREFAS ──
+function renderTarefas(tarefas) {
+  const container = document.getElementById('tarefas-lista');
+  if (tarefas.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Nenhuma tarefa diária</div><div class="empty-desc">Crie tarefas que seus filhos devem fazer todo dia.</div></div>`;
+    return;
+  }
+  const hoje = new Date().toDateString();
+  container.innerHTML = tarefas.map(t => {
+    const filho = filhosData[t.filhoId];
+    const nomeFilho = filho ? filho.nome : '?';
+    const statusHoje = t.statusHoje?.[hoje] || 'pendente';
+    const cores = { pendente: 'badge-pendente', cumprida: 'badge-aprovada', nao_cumprida: 'badge-reprovada' };
+    const labels = { pendente: '⏳ Pendente', cumprida: '✅ Cumprida', nao_cumprida: '❌ Não cumprida' };
+    return `
+    <div class="missao-card">
+      <div class="missao-header">
+        <div>
+          <div class="missao-titulo">${t.titulo}</div>
+          <div class="missao-filho">Para: ${nomeFilho}</div>
+        </div>
+        <span class="badge ${cores[statusHoje]}">${labels[statusHoje]}</span>
+      </div>
+      <div class="missao-tempos">
+        <div class="tempo-chip ganho">✅ +${formatarMin(t.tempoGanho)}</div>
+        <div class="tempo-chip perde">❌ -${formatarMin(t.tempoPerde)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER: HISTÓRICO ──
+function renderHistorico(hist) {
+  const container = document.getElementById('historico-lista');
+  if (hist.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Sem histórico</div></div>`;
+    return;
+  }
+  container.innerHTML = hist.map(h => {
+    const filho = filhosData[h.filhoId];
+    const nomeFilho = filho ? filho.nome : '?';
+    const positivo = h.tempo > 0;
+    const tempoMin = Math.abs(Math.round(h.tempo / 60));
+    return `
+    <div class="card" style="padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:14px;font-weight:600">${h.descricao || h.tipo}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">${nomeFilho} · ${formatarData(h.criadoEm)}</div>
+        </div>
+        <span style="font-weight:700;font-size:16px;color:${positivo ? 'var(--green)' : 'var(--red)'}">
+          ${positivo ? '+' : '-'}${tempoMin}min
+        </span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatarData(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+function formatarMin(seg) {
+  if (!seg) return '0min';
+  const m = Math.round(seg / 60);
+  return m >= 60 ? `${Math.floor(m/60)}h${m%60?m%60+'min':''}` : `${m}min`;
+}
+
+// ── NAVEGAÇÃO ──
+let paginaAtual = 0;
+const TOTAL_PAGINAS = 6;
+
+window.irParaPagina = function(n) {
+  paginaAtual = n;
+  const el = document.getElementById('pages-scroll');
+  el.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+  el.style.transform = `translateX(-${n * 100}%)`;
+  document.querySelectorAll('.nav-item').forEach((btn, i) => btn.classList.toggle('active', i === n));
+};
+
+(function() {
+  const wrapper = document.getElementById('pages-scroll').parentElement;
+  let startX = 0, startY = 0, dragging = false, moved = false;
+
+  function onStart(x, y) {
+    startX = x; startY = y; dragging = true; moved = false;
+  }
+  function onMove(x) {
+    if (!dragging) return;
+    const dx = x - startX;
+    moved = true;
+    const el = document.getElementById('pages-scroll');
+    el.style.transition = 'none';
+    el.style.transform = `translateX(calc(-${paginaAtual * 100}% + ${dx}px))`;
+  }
+  function onEnd(x) {
+    if (!dragging) return;
+    dragging = false;
+    const dx = x - startX;
+    const el = document.getElementById('pages-scroll');
+    if (Math.abs(dx) > 60) {
+      const nova = dx < 0
+        ? Math.min(paginaAtual + 1, TOTAL_PAGINAS - 1)
+        : Math.max(paginaAtual - 1, 0);
+      irParaPagina(nova);
+    } else {
+      el.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+      el.style.transform = `translateX(-${paginaAtual * 100}%)`;
+    }
+  }
+
+  // Touch
+  wrapper.addEventListener('touchstart', e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  wrapper.addEventListener('touchmove', e => {
+    const dx = Math.abs(e.touches[0].clientX - startX);
+    const dy = Math.abs(e.touches[0].clientY - startY);
+    if (dx > dy) onMove(e.touches[0].clientX);
+  }, { passive: true });
+  wrapper.addEventListener('touchend', e => onEnd(e.changedTouches[0].clientX));
+
+  // Mouse
+  wrapper.addEventListener('mousedown', e => onStart(e.clientX, e.clientY));
+  wrapper.addEventListener('mousemove', e => { if (dragging) onMove(e.clientX); });
+  wrapper.addEventListener('mouseup', e => onEnd(e.clientX));
+  wrapper.addEventListener('mouseleave', e => { if (dragging) onEnd(e.clientX); });
+})();
+
+// ── MODAIS ──
+window.abrirModal = function(id) {
+  document.getElementById(id).classList.add('open');
+};
+window.fecharModal = function(id) {
+  document.getElementById(id).classList.remove('open');
+};
+
+window.abrirAddTempo = function(uid, nome) {
+  document.getElementById('modal-add-tempo-uid').value = uid;
+  document.getElementById('modal-add-tempo-titulo').textContent = `Adicionar tempo — ${nome}`;
+  document.getElementById('add-tempo-min').value = '';
+  document.getElementById('add-tempo-motivo').value = '';
+  abrirModal('modal-add-tempo');
+};
+
+window.abrirRemTempo = function(uid, nome) {
+  document.getElementById('modal-rem-tempo-uid').value = uid;
+  document.getElementById('modal-rem-tempo-titulo').textContent = `Remover tempo — ${nome}`;
+  document.getElementById('rem-tempo-min').value = '';
+  document.getElementById('rem-tempo-motivo').value = '';
+  abrirModal('modal-rem-tempo');
+};
+
+window.abrirMulta = function(uid, nome) {
+  document.getElementById('modal-multa-uid').value = uid;
+  document.getElementById('multa-uso-min').value = '';
+  document.getElementById('multa-extra-min').value = '';
+  abrirModal('modal-multa');
+};
+
+window.toggleBloqueio = async function(uid, bloqueado) {
+  const estaBloqueado = bloqueado === 'true' || bloqueado === true;
+  await updateDoc(doc(db, 'usuarios', uid), { timerBloqueado: !estaBloqueado });
+  toast(!estaBloqueado ? '🔒 Filho não pode parar o contador' : '🔓 Filho pode parar o contador');
+};
+
+window.congelarTimer = async function(uid, rodando) {
+  const isRodando = rodando === 'true' || rodando === true;
+  const filho = filhosData[uid];
+  if (!filho) return;
+
+  if (isRodando) {
+    const tempoAtual = calcTempoAtual(filho);
+    await updateDoc(doc(db, 'usuarios', uid), {
+      timerRodando: false,
+      timerInicio: null,
+      tempoDisponivel: tempoAtual
+    });
+    toast('Timer pausado');
+  } else {
+    await updateDoc(doc(db, 'usuarios', uid), {
+      timerRodando: true,
+      timerInicio: serverTimestamp()
+    });
+    toast('Timer iniciado');
+  }
+};
+
+window.confirmarAddTempo = async function() {
+  const uid = document.getElementById('modal-add-tempo-uid').value;
+  const min = parseInt(document.getElementById('add-tempo-min').value);
+  const motivo = document.getElementById('add-tempo-motivo').value.trim();
+  if (!min || min <= 0) return toast('Informe os minutos');
+  const seg = min * 60;
+  await updateDoc(doc(db, 'usuarios', uid), { tempoDisponivel: increment(seg) });
+  await addDoc(collection(db, 'historico'), {
+    familiaId: currentFamiliaId,
+    filhoId: uid,
+    tipo: 'bonus',
+    descricao: motivo || `Tempo adicionado pelo pai`,
+    tempo: seg,
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-add-tempo');
+  toast(`+${min}min adicionados ✅`);
+};
+
+window.confirmarRemTempo = async function() {
+  const uid = document.getElementById('modal-rem-tempo-uid').value;
+  const min = parseInt(document.getElementById('rem-tempo-min').value);
+  const motivo = document.getElementById('rem-tempo-motivo').value.trim();
+  if (!min || min <= 0) return toast('Informe os minutos');
+  const seg = min * 60;
+  await updateDoc(doc(db, 'usuarios', uid), { tempoDisponivel: increment(-seg) });
+  await addDoc(collection(db, 'historico'), {
+    familiaId: currentFamiliaId,
+    filhoId: uid,
+    tipo: 'multa',
+    descricao: motivo || `Tempo removido pelo pai`,
+    tempo: -seg,
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-rem-tempo');
+  toast(`-${min}min removidos`);
+};
+
+window.confirmarMulta = async function() {
+  const uid = document.getElementById('modal-multa-uid').value;
+  const usoMin = parseInt(document.getElementById('multa-uso-min').value) || 0;
+  const extraMin = parseInt(document.getElementById('multa-extra-min').value) || 0;
+  const totalSeg = (usoMin + extraMin) * 60;
+  if (totalSeg <= 0) return toast('Informe os valores');
+  await updateDoc(doc(db, 'usuarios', uid), { tempoDisponivel: increment(-totalSeg) });
+  await addDoc(collection(db, 'historico'), {
+    familiaId: currentFamiliaId,
+    filhoId: uid,
+    tipo: 'multa',
+    descricao: `Multa: ${usoMin}min usados + ${extraMin}min de punição (sem ativar contador)`,
+    tempo: -totalSeg,
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-multa');
+  toast(`Multa de ${usoMin + extraMin}min aplicada`);
+};
+
+// ── MISSÕES ──
+function preencherSelectFilhos() {
+  const filhos = Object.values(filhosData);
+  const opts = filhos.map(f => `<option value="${f.uid}">${f.nome}</option>`).join('');
+  const todos = filhos.length > 1 ? '<option value="__todos__">👥 Todos os filhos</option>' : '';
+  document.getElementById('missao-filho-sel').innerHTML = todos + (opts || '<option value="">Nenhum filho</option>');
+  document.getElementById('tarefa-filho-sel').innerHTML = opts || '<option value="">Nenhum filho</option>';
+}
+
+window.criarMissao = async function() {
+  const sel = document.getElementById('missao-filho-sel').value;
+  const titulo = document.getElementById('missao-titulo').value.trim();
+  const desc = document.getElementById('missao-desc').value.trim();
+  const ganho = parseInt(document.getElementById('missao-ganho').value) || 0;
+  const perde = parseInt(document.getElementById('missao-perde').value) || 0;
+  if (!sel || !titulo) return toast('Preencha filho e título');
+
+  const filhoIds = sel === '__todos__'
+    ? Object.keys(filhosData)
+    : [sel];
+
+  await Promise.all(filhoIds.map(filhoId => addDoc(collection(db, 'missoes'), {
+    familiaId: currentFamiliaId,
+    filhoId,
+    titulo,
+    descricao: desc,
+    tempoGanho: ganho * 60,
+    tempoPerde: perde * 60,
+    status: 'pendente',
+    criadoEm: serverTimestamp()
+  })));
+
+  fecharModal('modal-nova-missao');
+  document.getElementById('missao-titulo').value = '';
+  document.getElementById('missao-desc').value = '';
+  toast(filhoIds.length > 1 ? `Missão enviada para ${filhoIds.length} filhos! ✅` : 'Missão criada! ✅');
+  irParaPagina(1);
+};
+
+window.abrirConfirmarMissao = function(missaoId) {
+  document.getElementById('confirmar-missao-id').value = missaoId;
+  fecharModal('modal-nova-missao');
+  abrirModal('modal-confirmar-missao');
+};
+
+window.responderMissao = async function(cumpriu) {
+  const missaoId = document.getElementById('confirmar-missao-id').value;
+  const snap = await getDoc(doc(db, 'missoes', missaoId));
+  if (!snap.exists()) return;
+  const m = snap.data();
+
+  const novoStatus = cumpriu ? 'aprovada' : 'reprovada';
+  const deltaTempo = cumpriu ? m.tempoGanho : -m.tempoPerde;
+
+  await updateDoc(doc(db, 'missoes', missaoId), { status: novoStatus });
+  await updateDoc(doc(db, 'usuarios', m.filhoId), { tempoDisponivel: increment(deltaTempo) });
+  await addDoc(collection(db, 'historico'), {
+    familiaId: currentFamiliaId,
+    filhoId: m.filhoId,
+    tipo: 'missao',
+    descricao: `Missão "${m.titulo}" — ${cumpriu ? 'aprovada' : 'reprovada'}`,
+    tempo: deltaTempo,
+    criadoEm: serverTimestamp()
+  });
+  fecharModal('modal-confirmar-missao');
+  toast(cumpriu ? `Missão aprovada! +${formatarMin(m.tempoGanho)}` : `Missão reprovada. -${formatarMin(m.tempoPerde)}`);
+};
+
+function getMissoesOcultas() {
+  return new Set(JSON.parse(localStorage.getItem(`missoes_ocultas_${currentUserId}`) || '[]'));
+}
+function salvarMissaoOculta(missaoId) {
+  const ocultas = getMissoesOcultas();
+  ocultas.add(missaoId);
+  localStorage.setItem(`missoes_ocultas_${currentUserId}`, JSON.stringify([...ocultas]));
+}
+
+window.responderSugestao = async function(missaoId, acao) {
+  await updateDoc(doc(db, 'missoes', missaoId), {
+    status: acao === 'aceitar' ? 'aceita' : 'recusada'
+  });
+  toast(acao === 'aceitar' ? 'Missão aceita! O filho será notificado 💪' : 'Sugestão recusada');
+};
+
+window.apagarMissao = function(missaoId) {
+  salvarMissaoOculta(missaoId);
+  document.querySelector(`[data-missao-id="${missaoId}"]`)?.remove();
+  toast('Missão removida 🗑️');
+};
+
+// ── TAREFAS ──
+window.criarTarefa = async function() {
+  const filhoId = document.getElementById('tarefa-filho-sel').value;
+  const titulo = document.getElementById('tarefa-titulo').value.trim();
+  const ganho = parseInt(document.getElementById('tarefa-ganho').value) || 0;
+  const perde = parseInt(document.getElementById('tarefa-perde').value) || 0;
+  if (!filhoId || !titulo) return toast('Preencha filho e título');
+  await addDoc(collection(db, 'tarefas_diarias'), {
+    familiaId: currentFamiliaId,
+    filhoId,
+    titulo,
+    tempoGanho: ganho * 60,
+    tempoPerde: perde * 60,
+    criadoEm: serverTimestamp(),
+    statusHoje: {}
+  });
+  fecharModal('modal-nova-tarefa');
+  document.getElementById('tarefa-titulo').value = '';
+  toast('Tarefa criada! ✅');
+  irParaPagina(2);
+};
+
+// ── HELPERS ──
+window.copiarCodigo = function() {
+  const codigo = document.getElementById('codigo-familia-val').textContent;
+  navigator.clipboard.writeText(codigo.toLowerCase()).then(() => toast('Código copiado! 📋'));
+};
+
+window.fazerLogout = async function() {
+  unsubscribers.forEach(u => u());
+  await signOut(auth);
+  window.location.href = 'index.html';
+};
+
+let badgeMissaoCount = 0;
+function notificarMissao(msg) {
+  badgeMissaoCount++;
+  const el = document.getElementById('badge-missoes');
+  el.textContent = badgeMissaoCount > 9 ? '9+' : badgeMissaoCount;
+  el.style.display = 'flex';
+  toast(msg);
+}
+window.limparBadgeMissoes = function() {
+  badgeMissaoCount = 0;
+  document.getElementById('badge-missoes').style.display = 'none';
+};
+
+function toast(msg, duracao = 2500) { // eslint-disable-line no-unused-vars
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), duracao);
+}
+
+// Atualizar timers em tempo real
+setInterval(() => {
+  Object.values(filhosData).forEach(f => {
+    if (!f.timerRodando) return;
+    const el = document.querySelector(`[data-tempo-uid="${f.uid}"]`);
+    if (!el) return;
+    const tempoSeg = calcTempoAtual(f);
+    el.textContent = formatarTempo(tempoSeg);
+    el.className = `tempo-valor ${tempoSeg > 300 ? 'positivo' : tempoSeg <= 0 ? 'zero' : 'negativo'}`;
+  });
+}, 1000);
+</script>
+</body>
+</html>
