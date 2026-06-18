@@ -548,7 +548,7 @@ select option { background: var(--surface); }
       <div class="topbar-avatar" id="topbar-inicial">P</div>
       <div>
         <div class="topbar-name" id="topbar-nome">Carregando...</div>
-        <div class="topbar-sub">App dos Pais</div>
+        <div class="topbar-sub" id="topbar-sub">TempoTela</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -880,6 +880,7 @@ onAuthStateChanged(auth, async (user) => {
   currentUserId = user.uid;
 
   document.getElementById('topbar-nome').textContent = currentUser.nome;
+  document.getElementById('topbar-sub').textContent = `App de ${currentUser.nome}`;
   document.getElementById('topbar-inicial').textContent = currentUser.nome[0].toUpperCase();
   document.getElementById('codigo-familia-val').textContent = currentFamiliaId.substring(0, 6).toUpperCase();
 
@@ -1090,8 +1091,8 @@ function renderMissoes(missoes) {
     aprovada: 'Aprovada ✅',
     reprovada: 'Reprovada ❌',
     recusada: 'Recusada',
-    nao_cumprida: 'Filho não cumpriu ❌',
-    sugerida: '💡 Sugerida pelo filho'
+    nao_cumprida: (nome) => `${nome} não cumpriu ❌`,
+    sugerida: (nome) => `💡 Sugerida por ${nome}`
   };
 
   const resolvidos = new Set(['aprovada','reprovada','recusada','nao_cumprida']);
@@ -1101,6 +1102,8 @@ function renderMissoes(missoes) {
     const nomeFilho = filho ? filho.nome : '?';
     const aguardando = m.status === 'aguardando_confirmacao';
     const resolvido = resolvidos.has(m.status);
+    const labelRaw = labelMap[m.status];
+    const label = typeof labelRaw === 'function' ? labelRaw(nomeFilho) : (labelRaw || m.status);
     return `
     <div class="missao-card" data-missao-id="${m.id}">
       <div class="missao-header">
@@ -1109,7 +1112,7 @@ function renderMissoes(missoes) {
           <div class="missao-filho">Para: ${nomeFilho}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px">
-          <span class="badge ${badgeMap[m.status] || 'badge-pendente'}">${labelMap[m.status] || m.status}</span>
+          <span class="badge ${badgeMap[m.status] || 'badge-pendente'}">${label}</span>
           ${resolvido ? `<button onclick="apagarMissao('${m.id}')" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);padding:2px 4px" title="Apagar">🗑️</button>` : ''}
         </div>
       </div>
@@ -1330,7 +1333,7 @@ window.confirmarAddTempo = async function() {
     familiaId: currentFamiliaId,
     filhoId: uid,
     tipo: 'bonus',
-    descricao: motivo || `Tempo adicionado pelo pai`,
+    descricao: motivo || `Tempo adicionado por ${currentUser.nome}`,
     tempo: seg,
     criadoEm: serverTimestamp()
   });
@@ -1349,7 +1352,7 @@ window.confirmarRemTempo = async function() {
     familiaId: currentFamiliaId,
     filhoId: uid,
     tipo: 'multa',
-    descricao: motivo || `Tempo removido pelo pai`,
+    descricao: motivo || `Tempo removido por ${currentUser.nome}`,
     tempo: -seg,
     criadoEm: serverTimestamp()
   });

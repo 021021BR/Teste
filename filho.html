@@ -731,6 +731,7 @@ let currentUser = null;
 let filhoData = null;
 let timerInterval = null;
 let unsubscribers = [];
+let nomeResponsavel = 'seu responsável';
 
 // ── AUTH ──
 onAuthStateChanged(auth, async (user) => {
@@ -744,6 +745,15 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = { uid: user.uid, ...snap.data() };
   document.getElementById('topbar-nome').textContent = currentUser.nome;
   document.getElementById('topbar-inicial').textContent = currentUser.nome[0].toUpperCase();
+  // Buscar nome do responsável
+  const famSnap = await getDoc(doc(db, 'familias', currentUser.familiaId));
+  if (famSnap.exists()) {
+    const paiUid = (famSnap.data().pais || [])[0];
+    if (paiUid) {
+      const paiSnap = await getDoc(doc(db, 'usuarios', paiUid));
+      if (paiSnap.exists()) nomeResponsavel = paiSnap.data().nome;
+    }
+  }
   iniciarListeners();
 });
 
@@ -788,14 +798,14 @@ function iniciarListeners() {
         } else if (statusAnterior && statusAnterior !== m.status) {
           if (m.status === 'aceita' && statusAnterior === 'sugerida') {
             mostrarBadgeMissoes(1);
-            toast('✅ Seu pai aceitou sua sugestão de missão!');
+            toast(`✅ ${nomeResponsavel} aceitou sua sugestão de missão!`);
           } else if (m.status === 'recusada' && statusAnterior === 'sugerida') {
             mostrarBadgeMissoes(1);
-            toast('❌ Seu pai recusou sua sugestão de missão.');
+            toast(`❌ ${nomeResponsavel} recusou sua sugestão de missão.`);
           } else if (m.status === 'aprovada') {
-            toast('🏆 Missão aprovada pelo pai! Tempo adicionado.');
+            toast(`🏆 Missão aprovada por ${nomeResponsavel}! Tempo adicionado.`);
           } else if (m.status === 'reprovada') {
-            toast('😔 Missão reprovada pelo pai.');
+            toast(`😔 Missão reprovada por ${nomeResponsavel}.`);
           }
         }
       });
@@ -1009,7 +1019,7 @@ window.toggleTimer = async function() {
       await updateDoc(doc(db, 'usuarios', currentUser.uid), {
         pedidoParadaEm: serverTimestamp()
       });
-      toast('🔒 Contador bloqueado pelo pai');
+      toast(`🔒 Contador bloqueado por ${nomeResponsavel}`);
       return;
     }
     // Parar: salvar tempo restante
@@ -1025,7 +1035,7 @@ window.toggleTimer = async function() {
       familiaId: currentUser.familiaId,
       filhoId: currentUser.uid,
       tipo: 'contador',
-      descricao: 'Timer pausado pelo filho',
+      descricao: `Timer pausado por ${currentUser.nome}`,
       tempo: 0,
       criadoEm: serverTimestamp()
     });
@@ -1065,7 +1075,7 @@ function renderMissoesResumo(missoes) {
 function renderMissoes(missoes) {
   const container = document.getElementById('missoes-lista');
   if (missoes.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Nenhuma missão</div><div class="empty-desc">Seu pai ainda não criou nenhuma missão.</div></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Nenhuma missão</div><div class="empty-desc">${nomeResponsavel} ainda não criou nenhuma missão.</div></div>`;
     return;
   }
 
@@ -1080,7 +1090,7 @@ function renderMissoes(missoes) {
     aguardando_confirmacao: '🟣 Aguardando confirmação',
     aprovada: '✅ Aprovada', reprovada: '❌ Reprovada',
     recusada: '🚫 Recusada', nao_cumprida: '❌ Não cumpri',
-    sugerida: '💡 Sugerida — aguardando pai'
+    sugerida: `💡 Sugerida — aguardando ${nomeResponsavel}`
   };
 
   const resolvidos = new Set(['aprovada','reprovada','recusada','nao_cumprida']);
@@ -1141,7 +1151,7 @@ window.sugerirMissao = async function() {
   document.getElementById('sug-desc').value = '';
   document.getElementById('sug-ganho').value = '';
   document.getElementById('sug-perde').value = '';
-  toast('Sugestão enviada para o pai! 💡');
+  toast(`Sugestão enviada para ${nomeResponsavel}! 💡`);
 };
 
 window.responderMissaoFilho = async function(missaoId, acao) {
@@ -1171,7 +1181,7 @@ window.cumprirMissao = async function(missaoId) {
     status: 'aguardando_confirmacao',
     cumpridoEm: serverTimestamp()
   });
-  toast('Aviso enviado para o pai! Aguardando confirmação 🟣');
+  toast(`Aviso enviado para ${nomeResponsavel}! Aguardando confirmação 🟣`);
 };
 
 window.naoCumprirMissao = async function(missaoId) {
@@ -1247,7 +1257,7 @@ window.abrirConfirmarTarefa = function(id, titulo, ganho) {
   document.getElementById('confirmar-tarefa-info').innerHTML = `
     <div style="background:var(--bg);border-radius:10px;padding:12px;border:1px solid var(--border)">
       <div style="font-size:14px;font-weight:600;margin-bottom:4px">${titulo}</div>
-      <div style="font-size:13px;color:var(--green)">+${formatarMin(ganho)} se confirmado pelo pai</div>
+      <div style="font-size:13px;color:var(--green)">+${formatarMin(ganho)} se confirmado por ${nomeResponsavel}</div>
     </div>`;
   abrirModal('modal-confirmar-tarefa');
 };
@@ -1267,7 +1277,7 @@ window.confirmarTarefaCumprida = async function() {
     criadoEm: serverTimestamp()
   });
   fecharModal('modal-confirmar-tarefa');
-  toast('Aviso enviado para o pai! ✅');
+  toast(`Aviso enviado para ${nomeResponsavel}! ✅`);
 };
 
 // ── PEDIDOS ──
